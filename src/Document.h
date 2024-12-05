@@ -1,15 +1,16 @@
 #pragma once
 
 #include <raylib.h>
+#include <filesystem>
 #include <map>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "figure/Figure.h"
 
 class Document {
-  inline static std::map<std::string, std::shared_ptr<Document>> documents;
+  inline static std::map<std::filesystem::path, std::shared_ptr<Document>>
+      documents;
 
   Document();
   Document(const Document&) = default;
@@ -19,11 +20,12 @@ class Document {
   std::vector<std::shared_ptr<figure::Figure>> figures;
 
  public:
-  static std::shared_ptr<Document> getDocument(const std::string_view& name);
-  static std::vector<std::string_view> getDocumentNames();
+  static std::shared_ptr<Document> getDocument(const std::filesystem::path& path);
+  static std::vector<std::filesystem::path> getDocumentNames();
 
   Vector2 getDimenstions();
   void setDimenstions(Vector2 newDims);
   const std::vector<std::shared_ptr<figure::Figure>>& getFigures();
   void addFigure(std::shared_ptr<figure::Figure> figure);
+  const std::filesystem::path& getFilePath();
 };

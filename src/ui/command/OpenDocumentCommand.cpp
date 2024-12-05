@@ -8,7 +8,7 @@ ui::command::OpenDocumentCommand::OpenDocumentCommand(
   assert(editor);
 }
 
-void ui::command::OpenDocumentCommand::execute(std::string_view docName) {
+void ui::command::OpenDocumentCommand::execute(std::filesystem::path docName) {
   auto doc = Document::getDocument(docName);
 
   editor->setDocument(std::move(doc));

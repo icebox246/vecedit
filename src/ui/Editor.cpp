@@ -83,8 +83,11 @@ void ui::Editor::update() {
 
     auto cursor = getCursorPos();
 
-    auto statusLine = std::format("Mode: {}  |  Cursor: {:7.2f}, {:7.2f}",
-                                  modeString, cursor.x, cursor.y);
+    auto path = doc->getFilePath();
+
+    auto statusLine =
+        std::format("Mode: {}  |  File: {}  |  Cursor: {:7.2f}, {:7.2f}",
+                    modeString, path.string(), cursor.x, cursor.y);
 
     GuiStatusBar(r, statusLine.c_str());
   }

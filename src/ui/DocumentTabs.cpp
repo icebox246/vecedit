@@ -8,12 +8,15 @@
 void ui::DocumentTabs::update() {
   const auto tabNames = Document::getDocumentNames();
 
+  std::vector<std::string> strings;
   std::vector<const char*> cstrings;
   cstrings.reserve(tabNames.size());
-  std::ranges::transform(tabNames, std::back_inserter(cstrings),
-                         [](const auto& s) { return s.data(); });
+  std::ranges::transform(tabNames, std::back_inserter(strings),
+                         [](const auto& s) { return s.filename(); });
+  std::ranges::transform(strings, std::back_inserter(cstrings),
+                         [](const auto& s) { return s.c_str(); });
 
-  auto it = std::ranges::find(tabNames, openedFileName);
+  auto it = std::ranges::find(tabNames, openedFilePath);
   if (it == tabNames.end())
     it = tabNames.begin();
 
@@ -30,13 +33,13 @@ void ui::DocumentTabs::update() {
 }
 
 void ui::DocumentTabs::setOpenedFile(std::string newName) {
-  openedFileName = std::move(newName);
+  openedFilePath = std::move(newName);
 
   if (openCommand)
-    openCommand->execute(openedFileName);
+    openCommand->execute(openedFilePath);
 }
 
 void ui::DocumentTabs::setOpenCommand(
-    std::shared_ptr<command::Command<std::string_view>> command) {
+    std::shared_ptr<command::Command<std::filesystem::path>> command) {
   openCommand = std::move(command);
 }

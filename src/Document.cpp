@@ -4,23 +4,26 @@
 
 Document::Document() {}
 
-std::shared_ptr<Document> Document::getDocument(const std::string_view& name) {
-  if (auto s = std::string(name); documents.contains(s)) {
-    return documents.at(s);
+std::shared_ptr<Document> Document::getDocument(
+    const std::filesystem::path& path) {
+  const auto absPath = std::filesystem::absolute(path);
+
+  if (documents.contains(absPath)) {
+    return documents.at(absPath);
   } else {
     auto [it, _] = documents.emplace(
-        s, new Document());  // This is not a good way to allocate shared
-                             // objects, but to force multiton behaviour it had
-                             // to be done this way
+        absPath, new Document());  // This is not a good way to allocate shared
+                                   // objects, but to force multiton behaviour
+                                   // it had to be done this way
     return it->second;
   }
 }
 
-std::vector<std::string_view> Document::getDocumentNames() {
-  std::vector<std::string_view> result;
+std::vector<std::filesystem::path> Document::getDocumentNames() {
+  std::vector<std::filesystem::path> result;
 
   std::ranges::transform(documents, std::back_inserter(result),
-                         [](auto& p) { return std::string_view(p.first); });
+                         [](auto& p) { return p.first; });
 
   return result;
 }
@@ -39,4 +42,11 @@ const std::vector<std::shared_ptr<figure::Figure>>& Document::getFigures() {
 
 void Document::addFigure(std::shared_ptr<figure::Figure> figure) {
   figures.emplace_back(std::move(figure));
+}
+
+const std::filesystem::path& Document::getFilePath() {
+  auto it = std::find_if(documents.begin(), documents.end(),
+                         [this](auto& p) { return p.second.get() == this; });
+
+  return it->first;
 }

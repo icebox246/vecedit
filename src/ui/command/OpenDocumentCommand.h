@@ -7,7 +7,7 @@
 
 namespace ui::command {
 
-class OpenDocumentCommand : public Command<std::string_view> {
+class OpenDocumentCommand : public Command<std::filesystem::path> {
   std::shared_ptr<Editor> editor;
   int newNameCounter = 0;
 
@@ -15,7 +15,7 @@ class OpenDocumentCommand : public Command<std::string_view> {
   OpenDocumentCommand(std::shared_ptr<Editor> editor);
   ~OpenDocumentCommand() override = default;
 
-  void execute(std::string_view docName) override;
+  void execute(std::filesystem::path docName) override;
 };
 
 }  // namespace ui::command

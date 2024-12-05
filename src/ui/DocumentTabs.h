@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -9,8 +10,8 @@
 namespace ui {
 
 class DocumentTabs : public Widget {
-  std::string openedFileName;
-  std::shared_ptr<command::Command<std::string_view>> openCommand;
+  std::filesystem::path openedFilePath;
+  std::shared_ptr<command::Command<std::filesystem::path>> openCommand;
 
  public:
   ~DocumentTabs() override = default;
@@ -20,7 +21,7 @@ class DocumentTabs : public Widget {
   void setOpenedFile(std::string newName);
 
   void setOpenCommand(
-      std::shared_ptr<command::Command<std::string_view>> command);
+      std::shared_ptr<command::Command<std::filesystem::path>> command);
 };
 
 }  // namespace ui
