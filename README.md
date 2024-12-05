@@ -9,7 +9,7 @@ Install:
 - `raylib` >= 5.5
 - `pkg-config`
 - `make`
-- `clang`
+- `clang` or `gcc`
 
 Run:
 
