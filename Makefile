@@ -1,4 +1,4 @@
-CXX = clang++
+UNAME_S = $(shell uname -s)
 
 OBJECTS += src/main.o
 OBJECTS += src/Document.o
@@ -31,8 +31,11 @@ CFLAGS += -Ithirdparty
 CFLAGS += `pkg-config raylib --cflags`
 CFLAGS += -Werror
 
-# LDFLAGS += -framework IOKit -framework Cocoa -framework OpenGL
 LDFLAGS += `pkg-config raylib --libs`
+
+ifeq (${UNAME_S},Darwin)
+	LDFLAGS += -framework IOKit -framework Cocoa -framework OpenGL
+endif
 
 main: ${OBJECTS}
 	${CXX} -o $@ ${OBJECTS} ${LDFLAGS}
