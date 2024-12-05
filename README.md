@@ -8,12 +8,20 @@ Install:
 
 - `raylib` >= 5.5
 - `pkg-config`
-- `make`
+- `cmake` >= 3.30
 - `clang` or `gcc`
 
-Run:
+To setup build environment (manually):
 
 ```
-make -j8   # Use number of your CPUs
-./main
+mkdir build
+cd build
+cmake ..
+```
+
+To build and run (assuming current directory is already `build/`)
+
+```
+make -j8   # number relies on CPU count
+./VecEdit
 ```
