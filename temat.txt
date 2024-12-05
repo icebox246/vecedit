@@ -1,0 +1,23 @@
+Edytor grafiki wektorowej.
+
+Aplikacja pozwala na tworzenie, edycję i organizację
+grafik wektorowych za pomocą prostych narzędzi. Użytkownik może rysować
+podstawowe kształty (np. linie, prostokąty, elipsy, wielokąty), modyfikować ich
+właściwości (kolor, obrys, przezroczystość), przesuwać i skalować obiekty, a
+także grupować je i zarządzać warstwami (w tym ukrywać je, blokować lub
+zmieniać ich kolejność). Użytkownik może zaznaczać pojedyncze obiekty lub
+obszary, wycinać je i wklejać, cofać i ponawiać zmiany, wyrównywać obiekty do
+siatki lub względem siebie. Aplikacja umożliwia zapisywanie projektów w
+formacie wektorowym (np. SVG) oraz eksportowanie ich do popularnych formatów
+graficznych (np. PNG, JPEG).
+
+
+Wzorce:
+- Multiton - do pilnowania otwartych dokumentów
+- Prototype - do tworzenia nowych obiektów
+- Composite - do tworzenia drzewiastej struktury obiektów
+- Visitor - do rysowania grafik
+- Command - do wykonywania poleceń z różnych źródeł
+
+MVP:
+Tworzenie plików, dodawanie prostokątów
