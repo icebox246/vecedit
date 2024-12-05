@@ -44,4 +44,4 @@ main: ${OBJECTS}
 	${CXX} -c -o $@ $^ ${CFLAGS}
 
 compile_flags.txt: Makefile
-	echo ${CFLAGS} | sed 's/ /\n/g' > $@
+	echo ${CFLAGS} -xc++ | sed 's/ /\n/g' > $@
