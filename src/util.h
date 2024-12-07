@@ -3,7 +3,7 @@
 constexpr static inline bool isOnMaxOS() {
 #ifdef __APPLE__
   return true;
-#elif
+#else
   return false;
 #endif
 }
