@@ -20,6 +20,11 @@ class Document {
   +const std::vector<std::shared_ptr<figure::Figure>>& getFigures()
   +void addFigure(std::shared_ptr<figure::Figure> figure)
   +const std::filesystem::path& getFilePath()
+  +void setFilePath(const std::filesystem::path&)
+  +void close()
+  +void loadFromFile()
+  +void saveToFile()
+  +void exportAsBitmap(BitmapFormat format)
 }
 
 Document -* Document
@@ -98,10 +103,33 @@ class figure::RectFigure {
   +void setDimensions(Vector2 newDimensions)
   +Rectangle getRectangle()
 
-  +std::shared_ptr<PointEditor> makePointEditor() override
+  +std::shared_ptr<PointEditor> makePointEditor()
 }
 
 figure::FigureBase <|-- figure::RectFigure : FigureType = RectFigure
+
+class figure::LineFigure {
+  -Vector2 secondPoint
+
+  +void setSecondPoint(Vector2 newPosition)
+  +Vector2 getSecondPoint()
+
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::FigureBase <|-- figure::LineFigure : FigureType = LineFigure
+
+class figure::PolygonFigure {
+  -std::vector<Vector2> points;
+
+  +void insertPoint(std::size_t idx, Vector2 newPosition)
+  +void updatePoint(std::size_t idx, Vector2 newPosition)
+  +const std::vector<Vector2>& getPoints()
+
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::FigureBase <|-- figure::PolygonFigure : FigureType = PolygonFigure
 
 interface figure::PointEditor {
   {abstract} std::vector<Point> getEditPoints()
@@ -129,17 +157,43 @@ class figure::adapter::CircleFigurePointEditor {
   +void updatePointPosition(std::size_t pointId, Vector2 newPos)
 }
 
+figure::PointEditor <|-- figure::adapter::CircleFigurePointEditor : <<implement>>
+figure::adapter::CircleFigurePointEditor o-- figure::CircleFigure
+
+class figure::adapter::LineFigurePointEditor {
+  -std::shared_ptr<LineFigure> line
+
+  +LineFigurePointEditor(std::shared_ptr<LineFigure> line)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::LineFigurePointEditor : <<implement>>
+figure::adapter::LineFigurePointEditor o-- figure::LineFigure
+
+class figure::adapter::PolygonFigurePointEditor {
+  -std::shared_ptr<PolygonFigure> poly
+
+  +PolygonFigurePointEditor(std::shared_ptr<PolygonFigure> poly)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::PolygonFigurePointEditor : <<implement>>
+figure::adapter::PolygonFigurePointEditor o-- figure::PolygonFigure
+
 note right of adapter
   Klasy znajduące się w przestrzeni `figure::adapter` stanowią Adaptery
   poszczególnych podklas `figure::Figure` do interfejsu `figure::PointEditor`
 end note
 
-figure::PointEditor <|-- figure::adapter::CircleFigurePointEditor : <<implement>>
-figure::adapter::CircleFigurePointEditor o-- figure::CircleFigure
-
 interface figure::visitor::FigureVisitor {
   +{abstract} void visit(RectFigure& rect)
   +{abstract} void visit(CircleFigure& circle)
+  +{abstract} void visit(LineFigure& line)
+  +{abstract} void visit(PolygonFigure& poly)
 }
 
 note right of FigureVisitor
@@ -149,9 +203,28 @@ end note
 class figure::visitor::RendererVisitor {
   +void visit(RectFigure& rect)
   +void visit(CircleFigure& circle)
+  +void visit(LineFigure& line)
+  +void visit(PolygonFigure& poly)
 }
 
 figure::visitor::FigureVisitor <|-- figure::visitor::RendererVisitor
+
+class figure::visitor::BitmapRendererVisitor {
+  -int width, height
+  -RenderTexture2D renderTexture
+
+  +BitmapRendererVisitor(int width, int height)
+  +Image getImage()
+
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+  +void visit(LineFigure& line)
+  +void visit(PolygonFigure& poly)
+
+  -void visitImpl<F>(F& figure)
+}
+
+figure::visitor::RendererVisitor <|-- figure::visitor::BitmapRendererVisitor
 
 class figure::visitor::PointIntersectionVisitor {
   -Vector2 point
@@ -163,9 +236,27 @@ class figure::visitor::PointIntersectionVisitor {
 
   +void visit(RectFigure& rect)
   +void visit(CircleFigure& circle)
+  +void visit(LineFigure& line)
+  +void visit(PolygonFigure& poly)
 }
 
 figure::visitor::FigureVisitor <|-- figure::visitor::PointIntersectionVisitor
+
+class figure::visitor::SvgSerializedVisitor {
+  -std::stringstream outStream
+
+  +SvgSerializedVisitor(Vector2 point)
+
+  +void reset()
+  +std::string finalize()
+
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+  +void visit(LineFigure& line)
+  +void visit(PolygonFigure& poly)
+}
+
+figure::visitor::FigureVisitor <|-- figure::visitor::SvgSerializedVisitor
 
 abstract ui::Widget {
   #Rectangle rect
@@ -227,6 +318,9 @@ class ui::Editor {
   -std::optional<std::size_t> draggedPointId
 
   -std::shared_ptr<FigurePropertiesPanel> propsPanel
+  -std::shared_ptr<DocumentPropertiesPanel> docPropsPanel
+
+  -std::shared_ptr<Command<std::filesystem::path>> openCommand
 
   -GuiIconName cursorIcon = ICON_NONE
 
@@ -240,12 +334,14 @@ class ui::Editor {
   +void setMode(Mode newMode)
   +void setFigurePrototype(std::shared_ptr<figure::Figure> newProto)
   +void setCursorIcon(GuiIconName icon)
+  +void setOpenCommand(std::shared_ptr<command::Command<std::filesystem::path>> newCommand)
 
   -bool isFocused()
   -Vector2 getCursorPos()
   -void processModeSelect()
   -void processModeInsert()
   -void selectFigure(std::shared_ptr<figure::Figure> figure)
+  -void handleDroppedFiles(FilePathList droppedFiles)
 }
 
 ui::Widget <|-- ui::Editor
@@ -253,6 +349,7 @@ ui::Editor o--- Document
 ui::Editor o--- "1" figure::Figure : holds prototype
 ui::Editor o--- "1" figure::Figure : has selected
 ui::Editor *-- ui::FigurePropertiesPanel
+ui::Editor o--- ui::command::Command
 
 class ui::FigurePropertiesPanel {
   -std::shared_ptr<figure::Figure> editedFig
@@ -265,6 +362,17 @@ class ui::FigurePropertiesPanel {
 
 ui::Widget <|-- ui::FigurePropertiesPanel
 ui::FigurePropertiesPanel o--- "1" figure::Figure : edits
+
+class ui::DocumentPropertiesPanel {
+  -std::shared_ptr<Document> editedDoc
+
+  +void update()
+
+  +void setDocument(std::shared_ptr<Document> newDoc)
+}
+
+ui::Widget <|-- ui::DocumentPropertiesPanel
+ui::DocumentPropertiesPanel o--- "1" Document : edits
 
 class ui::IconButton {
   -GuiIconName icon
@@ -316,9 +424,7 @@ class ui::command::SetFigureInsertCommand {
   -std::shared_ptr<figure::Figure> figurePrototype
   -GuiIconName icon
 
-  +SetFigureInsertCommand(std::shared_ptr<Editor> editor,
-                         std::shared_ptr<figure::Figure> figurePrototype,
-                         GuiIconName icon)
+  +SetFigureInsertCommand(std::shared_ptr<Editor> editor, std::shared_ptr<figure::Figure> figurePrototype, GuiIconName icon)
 
   +void execute()
 }
