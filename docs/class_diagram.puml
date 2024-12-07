@@ -242,10 +242,10 @@ class figure::visitor::PointIntersectionVisitor {
 
 figure::visitor::FigureVisitor <|-- figure::visitor::PointIntersectionVisitor
 
-class figure::visitor::SvgSerializedVisitor {
+class figure::visitor::SvgSerializerVisitor {
   -std::stringstream outStream
 
-  +SvgSerializedVisitor(Vector2 point)
+  +SvgSerializerVisitor(Vector2 point)
 
   +void reset()
   +std::string finalize()
@@ -256,7 +256,7 @@ class figure::visitor::SvgSerializedVisitor {
   +void visit(PolygonFigure& poly)
 }
 
-figure::visitor::FigureVisitor <|-- figure::visitor::SvgSerializedVisitor
+figure::visitor::FigureVisitor <|-- figure::visitor::SvgSerializerVisitor
 
 abstract ui::Widget {
   #Rectangle rect
