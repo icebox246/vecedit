@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
 
-find_package(PkgConfig)
-pkg_check_modules(RAYLIB REQUIRED raylib)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(RAYLIB REQUIRED IMPORTED_TARGET raylib>=5.5)
 
 project(VecEdit CXX)
 
@@ -12,7 +12,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 add_compile_options(-Werror)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    add_link_options(-framework IOKit -framework Cocoa -framework OpenGL)
+    find_library(IOKIT_LIBRARY IOKit)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(OPENGL_LIBRARY OpenGL)
+    mark_as_advanced (IOKIT_LIBRARY
+        COCOA_LIBRARY
+        OPENGL_LIBRARY)
+    set(EXTRA_MACOS_LIBS ${IOKIT_LIBRARY} ${COCOA_LIBRARY} ${OPENGL_LIBRARY})
 endif()
 
 set(SOURCE 
@@ -53,6 +59,6 @@ add_executable(VecEdit
 
 target_include_directories(VecEdit PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
 
-target_link_libraries(VecEdit ${RAYLIB_LIBRARIES})
-target_include_directories(VecEdit PUBLIC ${RAYLIB_INCLUDE_DIRS})
-target_compile_options(VecEdit PUBLIC ${RAYLIB_CFLAGS_OTHER})
+target_link_libraries(VecEdit PkgConfig::RAYLIB)
+
+target_link_libraries(VecEdit ${EXTRA_MACOS_LIBS})

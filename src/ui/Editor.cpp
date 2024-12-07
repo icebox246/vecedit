@@ -8,6 +8,7 @@
 
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
+#include "../util.h"
 
 namespace {
 constexpr auto PropsPanelWidth = 300;
@@ -29,9 +30,9 @@ void ui::Editor::update() {
   }
 
   if (isFocused()) {
-    if (IsKeyDown(KEY_LEFT_SUPER)) {
+    if (IsKeyDown(KEY_LEFT_CONTROL)) {
       camera.zoom *= 1 + GetMouseWheelMoveV().y * 0.05;
-    } else if (IsKeyDown(KEY_LEFT_SHIFT)) {
+    } else if (!isOnMaxOS() && IsKeyDown(KEY_LEFT_SHIFT)) {
       camera.target.x += GetMouseWheelMoveV().y * -15 / camera.zoom;
     } else {
       camera.target += GetMouseWheelMoveV() * -15 / camera.zoom;
