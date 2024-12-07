@@ -1,0 +1,330 @@
+@startuml
+
+set separator ::
+
+class Document {
+  -{static} std::map<std::filesystem::path, std::shared_ptr<Document>> documents
+
+  -Vector2 dimensions
+  -std::vector<std::shared_ptr<figure::Figure>> figures
+
+  +{static} std::shared_ptr<Document> getDocument(const std::filesystem::path& path)
+  +{static} std::vector<std::filesystem::path> getDocumentNames()
+
+  -Document()
+  -Document(const Document&) = default
+  -Document(Document&&) = default
+
+  +Vector2 getDimenstions()
+  +void setDimenstions(Vector2 newDims)
+  +const std::vector<std::shared_ptr<figure::Figure>>& getFigures()
+  +void addFigure(std::shared_ptr<figure::Figure> figure)
+  +const std::filesystem::path& getFilePath()
+}
+
+Document -* Document
+Document *--- "0..n" figure::Figure
+
+note right of Document
+  Ta klasa stanowi Multiton
+end note
+
+abstract figure::Figure {
+  +{abstract} std::shared_ptr<Figure> clone()
+
+  +{abstract} Vector2 getOrigin()
+  +{abstract} void setOrigin(Vector2 origin)
+
+  +{abstract} void accept(visitor::FigureVisitor& vis)
+
+  +{abstract} std::shared_ptr<PointEditor> makePointEditor()
+
+  +{abstract} Color getFill()
+  +{abstract} void setFill(Color c)
+
+  +{abstract} Color getStroke()
+  +{abstract} void setStroke(Color c)
+
+  +{abstract} float getStrokeWeight()
+  +{abstract} void setStrokeWeight(float w)
+}
+
+note right of Figure::clone
+  Metoda `clone` pozwala tworzyć kopię obiektu, pozwalając na imlementację Prototypu
+end note
+
+note right of Figure::makePointEditor
+  Metoda `makePointEditor` tworzy edytor odpowiedni dla danej figury implementując Factory Method
+end note
+
+class figure::FigureBase<FigureType> {
+  #Vector2 origin;
+  #Color fill, stroke;
+  #float strokeWeight;
+
+  +std::shared_ptr<Figure> clone()
+
+  +Vector2 getOrigin()
+  +void setOrigin(Vector2 newOrigin)
+
+  +void accept(visitor::FigureVisitor& vis)
+
+  +Color getFill()
+  +void setFill(Color c)
+
+  +Color getStroke()
+  +void setStroke(Color c)
+
+  +float getStrokeWeight()
+  +void setStrokeWeight(float w)
+}
+
+figure::Figure <|-- figure::FigureBase : <<implements>>
+
+class figure::CircleFigure {
+  -float radius
+
+  +void setRadius(float newRadius)
+  +float getRadius()
+
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::FigureBase <|-- figure::CircleFigure : FigureType = CircleFigure
+
+class figure::RectFigure {
+  -Vector2 dimensions
+
+  +void setDimensions(Vector2 newDimensions)
+  +Rectangle getRectangle()
+
+  +std::shared_ptr<PointEditor> makePointEditor() override
+}
+
+figure::FigureBase <|-- figure::RectFigure : FigureType = RectFigure
+
+interface figure::PointEditor {
+  {abstract} std::vector<Point> getEditPoints()
+  {abstract} void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+class figure::adapter::RectFigurePointEditor {
+  -std::shared_ptr<RectFigure> rect
+
+  +RectFigurePointEditor(std::shared_ptr<RectFigure> rect)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::RectFigurePointEditor : <<implement>>
+figure::adapter::RectFigurePointEditor o-- figure::RectFigure
+
+class figure::adapter::CircleFigurePointEditor {
+  -std::shared_ptr<CircleFigure> circle
+
+  +CircleFigurePointEditor(std::shared_ptr<CircleFigure> circle)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+note right of adapter
+  Klasy znajduące się w przestrzeni `figure::adapter` stanowią Adaptery
+  poszczególnych podklas `figure::Figure` do interfejsu `figure::PointEditor`
+end note
+
+figure::PointEditor <|-- figure::adapter::CircleFigurePointEditor : <<implement>>
+figure::adapter::CircleFigurePointEditor o-- figure::CircleFigure
+
+interface figure::visitor::FigureVisitor {
+  +{abstract} void visit(RectFigure& rect)
+  +{abstract} void visit(CircleFigure& circle)
+}
+
+note right of FigureVisitor
+  Klasa stanowi interfejs Odwiedzających podklasy `figure::Figure`
+end note
+
+class figure::visitor::RendererVisitor {
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+}
+
+figure::visitor::FigureVisitor <|-- figure::visitor::RendererVisitor
+
+class figure::visitor::PointIntersectionVisitor {
+  -Vector2 point
+  -bool gotIntersection = false
+
+  +PointIntersectionVisitor(Vector2 point)
+
+  +bool intersects()
+
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+}
+
+figure::visitor::FigureVisitor <|-- figure::visitor::PointIntersectionVisitor
+
+abstract ui::Widget {
+  #Rectangle rect
+
+  +{abstract} void update();
+  +void setRect(const Rectangle& rect)
+}
+
+note right of Widget
+  Klasa opisuje komponent w hierarchi budującej interfejs użytkownika
+  implementując wzorzec Kompozyt
+end note
+
+class ui::AppUi {
+  -std::shared_ptr<DocumentTabs> tabBar
+  -std::shared_ptr<Toolbar> toolbar
+  -std::shared_ptr<Editor> editor
+
+  #AppUi()
+
+  #void update()
+  #void setRect(const Rectangle& rect)
+}
+
+ui::Widget <|-- ui::AppUi
+
+class ui::DocumentTabs {
+  -std::filesystem::path openedFilePath
+  -std::shared_ptr<command::Command<std::filesystem::path>> openCommand
+
+  +void update()
+
+  +void setOpenedFile(std::string newName);
+  +void setOpenCommand(std::shared_ptr<command::Command<std::filesystem::path>> command);
+}
+
+ui::Widget <|-- ui::DocumentTabs
+ui::DocumentTabs o-- ui::command::Command
+
+class ui::Toolbar {
+  -std::vector<std::shared_ptr<Widget>> widgets
+
+  +void update()
+  +void setRect(const Rectangle& rect)
+
+  +void addWidget(std::shared_ptr<Widget> tool)
+}
+
+ui::Widget <|-- ui::Toolbar
+ui::Toolbar *-- "0..n" ui::Widget
+
+class ui::Editor {
+  -std::shared_ptr<Document> doc
+  -Camera2D camera
+  -Mode mode = Mode::Select
+  -std::shared_ptr<figure::Figure> figurePrototype
+
+  -std::shared_ptr<figure::Figure> selectedFigure
+  -std::optional<std::size_t> draggedPointId
+
+  -std::shared_ptr<FigurePropertiesPanel> propsPanel
+
+  -GuiIconName cursorIcon = ICON_NONE
+
+  +Editor()
+
+  +void update()
+  +void setRect(const Rectangle& rect)
+
+  +void setDocument(std::shared_ptr<Document> doc)
+  +void resetCamera()
+  +void setMode(Mode newMode)
+  +void setFigurePrototype(std::shared_ptr<figure::Figure> newProto)
+  +void setCursorIcon(GuiIconName icon)
+
+  -bool isFocused()
+  -Vector2 getCursorPos()
+  -void processModeSelect()
+  -void processModeInsert()
+  -void selectFigure(std::shared_ptr<figure::Figure> figure)
+}
+
+ui::Widget <|-- ui::Editor
+ui::Editor o--- Document
+ui::Editor o--- "1" figure::Figure : holds prototype
+ui::Editor o--- "1" figure::Figure : has selected
+ui::Editor *-- ui::FigurePropertiesPanel
+
+class ui::FigurePropertiesPanel {
+  -std::shared_ptr<figure::Figure> editedFig
+  -ColorMode colorEditMode = ColorMode::Fill
+
+  +void update()
+
+  +void setFigure(std::shared_ptr<figure::Figure> newFig)
+}
+
+ui::Widget <|-- ui::FigurePropertiesPanel
+ui::FigurePropertiesPanel o--- "1" figure::Figure : edits
+
+class ui::IconButton {
+  -GuiIconName icon
+  -std::shared_ptr<command::Command<>> command
+
+  +IconButton(GuiIconName icon)
+  +void update()
+
+  +void setCommand(std::shared_ptr<command::Command<>> newCommand)
+}
+
+ui::Widget <|-- ui::IconButton
+ui::IconButton o-- ui::command::Command
+
+interface  ui::command::Command<Args...> {
+  {abstract} void execute(Args... args)
+}
+
+note right of Command
+  Klasa stanowi elastyczny interfejs klas implementujących
+  wzorzec Polecenie
+end note
+
+class ui::command::NewDocumentCommand {
+  -std::shared_ptr<DocumentTabs> tabs
+  -int newNameCounter = 0
+
+  +NewDocumentCommand(std::shared_ptr<DocumentTabs> tabs)
+
+  +void execute()
+}
+
+ui::command::Command <|-- ui::command::NewDocumentCommand : Args... = ()
+ui::command::NewDocumentCommand o-- ui::DocumentTabs : acts upon
+
+class ui::command::OpenDocumentCommand {
+  -std::shared_ptr<Editor> editor
+
+  +OpenDocumentCommand(std::shared_ptr<Editor> editor)
+
+  +void execute(std::filesystem::path docName)
+}
+
+ui::command::Command <|-- ui::command::OpenDocumentCommand : Args... = (std::filesystem::path)
+ui::command::OpenDocumentCommand o-- ui::Editor : acts upon
+
+class ui::command::SetFigureInsertCommand {
+  -std::shared_ptr<Editor> editor
+  -std::shared_ptr<figure::Figure> figurePrototype
+  -GuiIconName icon
+
+  +SetFigureInsertCommand(std::shared_ptr<Editor> editor,
+                         std::shared_ptr<figure::Figure> figurePrototype,
+                         GuiIconName icon)
+
+  +void execute()
+}
+
+ui::command::Command <|-- ui::command::SetFigureInsertCommand : Args... = ()
+ui::command::SetFigureInsertCommand o-- ui::Editor : acts upon
+ui::command::SetFigureInsertCommand *--- figure::Figure : stores the prototype
+
+@enduml

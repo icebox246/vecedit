@@ -9,7 +9,6 @@ namespace ui::command {
 
 class OpenDocumentCommand : public Command<std::filesystem::path> {
   std::shared_ptr<Editor> editor;
-  int newNameCounter = 0;
 
  public:
   OpenDocumentCommand(std::shared_ptr<Editor> editor);

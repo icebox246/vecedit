@@ -47,4 +47,5 @@ class Editor : Widget {
   void processModeInsert();
   void selectFigure(std::shared_ptr<figure::Figure> figure);
 };
+
 }  // namespace ui
