@@ -274,6 +274,7 @@ class ui::AppUi {
   -std::shared_ptr<DocumentTabs> tabBar
   -std::shared_ptr<Toolbar> toolbar
   -std::shared_ptr<Editor> editor
+  -std::vector<std::shared_ptr<KeyboardShortcut>> shortcuts
 
   #AppUi()
 
@@ -282,6 +283,10 @@ class ui::AppUi {
 }
 
 ui::Widget <|-- ui::AppUi
+ui::AppUi *-- ui::DocumentTabs
+ui::AppUi *-- ui::Toolbar
+ui::AppUi *-- ui::Editor
+ui::AppUi *-- "n" ui::KeyboardShortcut
 
 class ui::DocumentTabs {
   -std::filesystem::path openedFilePath
@@ -386,6 +391,18 @@ class ui::IconButton {
 
 ui::Widget <|-- ui::IconButton
 ui::IconButton o-- ui::command::Command
+
+class ui::KeyboardShortcut {
+  -int modifier, key;
+  -std::shared_ptr<command::Command<>> command
+
+  +KeyboardShortcut(int modifier, int key)
+  +void update()
+
+  +void setCommand(std::shared_ptr<command::Command<>> newCommand)
+}
+
+ui::KeyboardShortcut o-- ui::command::Command
 
 interface  ui::command::Command<Args...> {
   {abstract} void execute(Args... args)
