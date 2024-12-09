@@ -1,14 +1,14 @@
-#include "NewDocumentCommand.h"
+#include "NewDocumentStrategy.h"
 
 #include <format>
 
 #include "../../Document.h"
 
-ui::command::NewDocumentCommand::NewDocumentCommand(
+ui::strategy::NewDocumentStrategy::NewDocumentStrategy(
     std::shared_ptr<DocumentTabs> tabs)
     : tabs(std::move(tabs)) {}
 
-void ui::command::NewDocumentCommand::execute() {
+void ui::strategy::NewDocumentStrategy::execute() {
   // TODO use actual filepath selection dialog to set the filepath
   auto filePath = std::filesystem::current_path() /
                   std::format("new_{:02}", newNameCounter++);

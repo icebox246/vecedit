@@ -4,19 +4,19 @@
 #include <memory>
 
 #include "Widget.h"
-#include "command/Command.h"
+#include "strategy/Strategy.h"
 
 namespace ui {
 
 class IconButton : public Widget {
   GuiIconName icon;
-  std::shared_ptr<command::Command<>> command;
+  std::shared_ptr<strategy::Strategy<>> strategy;
 
  public:
   IconButton(GuiIconName icon);
   void update() override;
 
-  void setCommand(std::shared_ptr<command::Command<>> newCommand);
+  void setStrategy(std::shared_ptr<strategy::Strategy<>> newStrategy);
 };
 
 }  // namespace ui

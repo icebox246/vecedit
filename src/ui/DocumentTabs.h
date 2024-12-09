@@ -5,13 +5,13 @@
 #include <string>
 
 #include "Widget.h"
-#include "command/Command.h"
+#include "strategy/Strategy.h"
 
 namespace ui {
 
 class DocumentTabs : public Widget {
   std::filesystem::path openedFilePath;
-  std::shared_ptr<command::Command<std::filesystem::path>> openCommand;
+  std::shared_ptr<strategy::Strategy<std::filesystem::path>> openStrategy;
 
  public:
   ~DocumentTabs() override = default;
@@ -20,8 +20,8 @@ class DocumentTabs : public Widget {
 
   void setOpenedFile(std::string newName);
 
-  void setOpenCommand(
-      std::shared_ptr<command::Command<std::filesystem::path>> command);
+  void setOpenStrategy(
+      std::shared_ptr<strategy::Strategy<std::filesystem::path>> strategy);
 };
 
 }  // namespace ui

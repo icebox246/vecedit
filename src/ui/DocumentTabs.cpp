@@ -35,11 +35,11 @@ void ui::DocumentTabs::update() {
 void ui::DocumentTabs::setOpenedFile(std::string newName) {
   openedFilePath = std::move(newName);
 
-  if (openCommand)
-    openCommand->execute(openedFilePath);
+  if (openStrategy)
+    openStrategy->execute(openedFilePath);
 }
 
-void ui::DocumentTabs::setOpenCommand(
-    std::shared_ptr<command::Command<std::filesystem::path>> command) {
-  openCommand = std::move(command);
+void ui::DocumentTabs::setOpenStrategy(
+    std::shared_ptr<strategy::Strategy<std::filesystem::path>> strategy) {
+  openStrategy = std::move(strategy);
 }

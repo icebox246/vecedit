@@ -290,16 +290,16 @@ ui::AppUi *-- "n" ui::KeyboardShortcut
 
 class ui::DocumentTabs {
   -std::filesystem::path openedFilePath
-  -std::shared_ptr<command::Command<std::filesystem::path>> openCommand
+  -std::shared_ptr<strategy::Strategy<std::filesystem::path>> openStrategy
 
   +void update()
 
   +void setOpenedFile(std::string newName);
-  +void setOpenCommand(std::shared_ptr<command::Command<std::filesystem::path>> command);
+  +void setOpenStrategy(std::shared_ptr<strategy::Strategy<std::filesystem::path>> strategy);
 }
 
 ui::Widget <|-- ui::DocumentTabs
-ui::DocumentTabs o-- ui::command::Command
+ui::DocumentTabs o-- ui::strategy::Strategy
 
 class ui::Toolbar {
   -std::vector<std::shared_ptr<Widget>> widgets
@@ -325,7 +325,7 @@ class ui::Editor {
   -std::shared_ptr<FigurePropertiesPanel> propsPanel
   -std::shared_ptr<DocumentPropertiesPanel> docPropsPanel
 
-  -std::shared_ptr<Command<std::filesystem::path>> openCommand
+  -std::shared_ptr<Strategy<std::filesystem::path>> openStrategy
 
   -GuiIconName cursorIcon = ICON_NONE
 
@@ -339,7 +339,7 @@ class ui::Editor {
   +void setMode(Mode newMode)
   +void setFigurePrototype(std::shared_ptr<figure::Figure> newProto)
   +void setCursorIcon(GuiIconName icon)
-  +void setOpenCommand(std::shared_ptr<command::Command<std::filesystem::path>> newCommand)
+  +void setOpenStrategy(std::shared_ptr<strategy::Strategy<std::filesystem::path>> newStrategy)
   +void duplicateSelectedFigure()
 
   -bool isFocused()
@@ -355,7 +355,7 @@ ui::Editor o--- Document
 ui::Editor o--- "1" figure::Figure : holds prototype
 ui::Editor o--- "1" figure::Figure : has selected
 ui::Editor *-- ui::FigurePropertiesPanel
-ui::Editor o--- ui::command::Command
+ui::Editor o--- ui::strategy::Strategy
 
 class ui::FigurePropertiesPanel {
   -std::shared_ptr<figure::Figure> editedFig
@@ -382,84 +382,84 @@ ui::DocumentPropertiesPanel o--- "1" Document : edits
 
 class ui::IconButton {
   -GuiIconName icon
-  -std::shared_ptr<command::Command<>> command
+  -std::shared_ptr<strategy::Strategy<>> strategy
 
   +IconButton(GuiIconName icon)
   +void update()
 
-  +void setCommand(std::shared_ptr<command::Command<>> newCommand)
+  +void setStrategy(std::shared_ptr<strategy::Strategy<>> newStrategy)
 }
 
 ui::Widget <|-- ui::IconButton
-ui::IconButton o-- ui::command::Command
+ui::IconButton o-- ui::strategy::Strategy
 
 class ui::KeyboardShortcut {
   -int modifier, key;
-  -std::shared_ptr<command::Command<>> command
+  -std::shared_ptr<strategy::Strategy<>> strategy
 
   +KeyboardShortcut(int modifier, int key)
   +void update()
 
-  +void setCommand(std::shared_ptr<command::Command<>> newCommand)
+  +void setStrategy(std::shared_ptr<strategy::Strategy<>> newStrategy)
 }
 
-ui::KeyboardShortcut o-- ui::command::Command
+ui::KeyboardShortcut o-- ui::strategy::Strategy
 
-interface  ui::command::Command<Args...> {
+interface  ui::strategy::Strategy<Args...> {
   {abstract} void execute(Args... args)
 }
 
-note right of Command
+note right of Strategy
   Klasa stanowi elastyczny interfejs klas implementujących
-  wzorzec Polecenie
+  wzorzec Strategia
 end note
 
-class ui::command::NewDocumentCommand {
+class ui::strategy::NewDocumentStrategy {
   -std::shared_ptr<DocumentTabs> tabs
   -int newNameCounter = 0
 
-  +NewDocumentCommand(std::shared_ptr<DocumentTabs> tabs)
+  +NewDocumentStrategy(std::shared_ptr<DocumentTabs> tabs)
 
   +void execute()
 }
 
-ui::command::Command <|-- ui::command::NewDocumentCommand : Args... = ()
-ui::command::NewDocumentCommand o-- ui::DocumentTabs : acts upon
+ui::strategy::Strategy <|-- ui::strategy::NewDocumentStrategy : Args... = ()
+ui::strategy::NewDocumentStrategy o-- ui::DocumentTabs : acts upon
 
-class ui::command::OpenDocumentCommand {
+class ui::strategy::OpenDocumentStrategy {
   -std::shared_ptr<Editor> editor
 
-  +OpenDocumentCommand(std::shared_ptr<Editor> editor)
+  +OpenDocumentStrategy(std::shared_ptr<Editor> editor)
 
   +void execute(std::filesystem::path docName)
 }
 
-ui::command::Command <|-- ui::command::OpenDocumentCommand : Args... = (std::filesystem::path)
-ui::command::OpenDocumentCommand o-- ui::Editor : acts upon
+ui::strategy::Strategy <|-- ui::strategy::OpenDocumentStrategy : Args... = (std::filesystem::path)
+ui::strategy::OpenDocumentStrategy o-- ui::Editor : acts upon
 
-class ui::command::SetFigureInsertCommand {
+class ui::strategy::SetFigureInsertStrategy {
   -std::shared_ptr<Editor> editor
   -std::shared_ptr<figure::Figure> figurePrototype
   -GuiIconName icon
 
-  +SetFigureInsertCommand(std::shared_ptr<Editor> editor, std::shared_ptr<figure::Figure> figurePrototype, GuiIconName icon)
+  +SetFigureInsertStrategy(std::shared_ptr<Editor> editor, std::shared_ptr<figure::Figure> figurePrototype, GuiIconName icon)
 
   +void execute()
 }
 
-ui::command::Command <|-- ui::command::SetFigureInsertCommand : Args... = ()
-ui::command::SetFigureInsertCommand o-- ui::Editor : acts upon
-ui::command::SetFigureInsertCommand *--- figure::Figure : stores the prototype
+ui::strategy::Strategy <|-- ui::strategy::SetFigureInsertStrategy : Args... = ()
+ui::strategy::SetFigureInsertStrategy o-- ui::Editor : acts upon
+ui::strategy::SetFigureInsertStrategy *--- figure::Figure : stores the prototype
 
-class ui::command::DuplicateFigureCommand {
+class ui::strategy::DuplicateFigureStrategy {
   -std::shared_ptr<Editor> editor
 
-  +DuplicateFigureCommand(std::shared_ptr<Editor> editor)
+  +DuplicateFigureStrategy(std::shared_ptr<Editor> editor)
 
   +void execute()
 }
 
-ui::command::Command <|-- ui::command::DuplicateFigureCommand : Args... = ()
-ui::command::DuplicateFigureCommand o-- ui::Editor : acts upon
+ui::strategy::Strategy <|-- ui::strategy::DuplicateFigureStrategy : Args... = ()
+ui::strategy::DuplicateFigureStrategy o-- ui::Editor : acts upon
 
 @enduml

@@ -33,10 +33,10 @@ set(SOURCE
     src/ui/Editor.cpp
     src/ui/FigurePropertiesPanel.cpp
     
-    src/ui/command/NewDocumentCommand.cpp
-    src/ui/command/OpenDocumentCommand.cpp
-    src/ui/command/SetFigureInsertCommand.cpp
-    src/ui/command/SetSelectCommand.cpp
+    src/ui/strategy/NewDocumentStrategy.cpp
+    src/ui/strategy/OpenDocumentStrategy.cpp
+    src/ui/strategy/SetFigureInsertStrategy.cpp
+    src/ui/strategy/SetSelectStrategy.cpp
     
     src/figure/RectFigure.cpp
     src/figure/CircleFigure.cpp

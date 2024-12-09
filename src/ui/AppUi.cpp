@@ -7,10 +7,10 @@
 #include "../figure/RectFigure.h"
 #include "DocumentTabs.h"
 #include "IconButton.h"
-#include "command/NewDocumentCommand.h"
-#include "command/OpenDocumentCommand.h"
-#include "command/SetFigureInsertCommand.h"
-#include "command/SetSelectCommand.h"
+#include "strategy/NewDocumentStrategy.h"
+#include "strategy/OpenDocumentStrategy.h"
+#include "strategy/SetFigureInsertStrategy.h"
+#include "strategy/SetSelectStrategy.h"
 
 ui::AppUi::AppUi()
     : tabBar(std::make_shared<DocumentTabs>()),
@@ -26,21 +26,21 @@ ui::AppUi::AppUi()
   auto insertCircleButton = std::make_shared<IconButton>(ICON_PLAYER_RECORD);
 
   {
-    auto newDocCmd = std::make_shared<command::NewDocumentCommand>(tabBar);
+    auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
 
-    newDocButton->setCommand(newDocCmd);
+    newDocButton->setStrategy(newDocStrat);
   }
 
   {
-    auto openCmd = std::make_shared<command::OpenDocumentCommand>(editor);
+    auto openStrat = std::make_shared<strategy::OpenDocumentStrategy>(editor);
 
-    tabBar->setOpenCommand(openCmd);
+    tabBar->setOpenStrategy(openStrat);
   }
 
   {
-    auto selectCmd = std::make_shared<command::SetSelectCommand>(editor);
+    auto selectStrat = std::make_shared<strategy::SetSelectStrategy>(editor);
 
-    selectButton->setCommand(selectCmd);
+    selectButton->setStrategy(selectStrat);
   }
 
   {
@@ -50,10 +50,10 @@ ui::AppUi::AppUi()
     rect->setStroke(BLACK);
     rect->setStrokeWeight(1);
 
-    auto setRectCmd = std::make_shared<command::SetFigureInsertCommand>(
+    auto setRectStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
         editor, rect, ICON_PLAYER_STOP);
 
-    insertRectButton->setCommand(setRectCmd);
+    insertRectButton->setStrategy(setRectStrat);
   }
 
   {
@@ -63,10 +63,10 @@ ui::AppUi::AppUi()
     circle->setStroke(BLACK);
     circle->setStrokeWeight(1);
 
-    auto setCircleCmd = std::make_shared<command::SetFigureInsertCommand>(
+    auto setCircleStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
         editor, circle, ICON_PLAYER_RECORD);
 
-    insertCircleButton->setCommand(setCircleCmd);
+    insertCircleButton->setStrategy(setCircleStrat);
   }
 
   toolbar->addWidget(std::move(newDocButton));

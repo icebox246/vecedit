@@ -4,12 +4,12 @@ ui::IconButton::IconButton(GuiIconName icon) : icon(icon) {}
 
 void ui::IconButton::update() {
   if (GuiButton(rect, GuiIconText(icon, ""))) {
-    if (command)
-      command->execute();
+    if (strategy)
+      strategy->execute();
   }
 }
 
-void ui::IconButton::setCommand(
-    std::shared_ptr<command::Command<>> newCommand) {
-  command = std::move(newCommand);
+void ui::IconButton::setStrategy(
+    std::shared_ptr<strategy::Strategy<>> newStrategy) {
+  strategy = std::move(newStrategy);
 }

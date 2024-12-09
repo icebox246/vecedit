@@ -1,8 +1,8 @@
-#include "SetFigureInsertCommand.h"
+#include "SetFigureInsertStrategy.h"
 
 #include <cassert>
 
-ui::command::SetFigureInsertCommand::SetFigureInsertCommand(
+ui::strategy::SetFigureInsertStrategy::SetFigureInsertStrategy(
     std::shared_ptr<Editor> editor,
     std::shared_ptr<figure::Figure> figurePrototype,
     GuiIconName icon)
@@ -13,7 +13,7 @@ ui::command::SetFigureInsertCommand::SetFigureInsertCommand(
   assert(this->figurePrototype);
 }
 
-void ui::command::SetFigureInsertCommand::execute() {
+void ui::strategy::SetFigureInsertStrategy::execute() {
   editor->setMode(Editor::Mode::Insert);
   editor->setFigurePrototype(figurePrototype);
   editor->setCursorIcon(icon);
