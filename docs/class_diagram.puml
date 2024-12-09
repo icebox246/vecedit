@@ -340,6 +340,7 @@ class ui::Editor {
   +void setFigurePrototype(std::shared_ptr<figure::Figure> newProto)
   +void setCursorIcon(GuiIconName icon)
   +void setOpenCommand(std::shared_ptr<command::Command<std::filesystem::path>> newCommand)
+  +void duplicateSelectedFigure()
 
   -bool isFocused()
   -Vector2 getCursorPos()
@@ -449,5 +450,16 @@ class ui::command::SetFigureInsertCommand {
 ui::command::Command <|-- ui::command::SetFigureInsertCommand : Args... = ()
 ui::command::SetFigureInsertCommand o-- ui::Editor : acts upon
 ui::command::SetFigureInsertCommand *--- figure::Figure : stores the prototype
+
+class ui::command::DuplicateFigureCommand {
+  -std::shared_ptr<Editor> editor
+
+  +DuplicateFigureCommand(std::shared_ptr<Editor> editor)
+
+  +void execute()
+}
+
+ui::command::Command <|-- ui::command::DuplicateFigureCommand : Args... = ()
+ui::command::DuplicateFigureCommand o-- ui::Editor : acts upon
 
 @enduml
