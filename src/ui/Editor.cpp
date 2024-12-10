@@ -6,6 +6,7 @@
 #include <ranges>
 #include <utility>
 
+#include "../commands/MovePointCommand.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
 #include "../util.h"
@@ -163,6 +164,11 @@ void ui::Editor::processModeSelect() {
     auto points = pointEditor->getEditPoints();
 
     if (draggedPointId && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+      auto moveCmd = std::make_shared<command::MovePointCommand>(
+          selectedFigure, *draggedPointId, mouseDragStartPos, cursor);
+
+      doc->getCommandManager().addCommand(moveCmd);
+
       draggedPointId.reset();
     }
 
@@ -191,6 +197,7 @@ void ui::Editor::processModeSelect() {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
           clickHandled = true;
           draggedPointId = p.id;
+          mouseDragStartPos = cursor;
         }
       }
 
@@ -243,4 +250,14 @@ void ui::Editor::selectFigure(std::shared_ptr<figure::Figure> figure) {
   propsPanel->setFigure(figure);
   selectedFigure = std::move(figure);
   draggedPointId = {};
+}
+
+void ui::Editor::undo() {
+  if (doc)
+    doc->getCommandManager().undo();
+}
+
+void ui::Editor::redo() {
+  if (doc)
+    doc->getCommandManager().redo();
 }

@@ -46,6 +46,8 @@ set(SOURCE
     
     src/figure/adapter/RectFigurePointEditor.cpp
     src/figure/adapter/CircleFigurePointEditor.cpp
+
+    src/commands/CommandManager.cpp
 )
 
 set(THIRDPARYSOURCE

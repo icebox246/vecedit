@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 
+#include "commands/CommandManager.h"
 #include "figure/Figure.h"
 
 class Document {
@@ -16,11 +17,14 @@ class Document {
   Document(const Document&) = default;
   Document(Document&&) = default;
 
+  command::CommandManager commandManager;
+
   Vector2 dimensions;
   std::vector<std::shared_ptr<figure::Figure>> figures;
 
  public:
-  static std::shared_ptr<Document> getDocument(const std::filesystem::path& path);
+  static std::shared_ptr<Document> getDocument(
+      const std::filesystem::path& path);
   static std::vector<std::filesystem::path> getDocumentNames();
 
   Vector2 getDimenstions();
@@ -28,4 +32,6 @@ class Document {
   const std::vector<std::shared_ptr<figure::Figure>>& getFigures();
   void addFigure(std::shared_ptr<figure::Figure> figure);
   const std::filesystem::path& getFilePath();
+
+  command::CommandManager& getCommandManager();
 };

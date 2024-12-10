@@ -50,3 +50,7 @@ const std::filesystem::path& Document::getFilePath() {
 
   return it->first;
 }
+
+command::CommandManager& Document::getCommandManager() {
+  return commandManager;
+}

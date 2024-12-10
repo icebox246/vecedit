@@ -22,6 +22,7 @@ class Editor : Widget {
 
   std::shared_ptr<figure::Figure> selectedFigure = {};
   std::optional<std::size_t> draggedPointId = {};
+  Vector2 mouseDragStartPos;
 
   std::shared_ptr<FigurePropertiesPanel> propsPanel;
 
@@ -39,6 +40,8 @@ class Editor : Widget {
   void setMode(Mode newMode);
   void setFigurePrototype(std::shared_ptr<figure::Figure> newProto);
   void setCursorIcon(GuiIconName icon);
+  void undo();
+  void redo();
 
  private:
   bool isFocused();
