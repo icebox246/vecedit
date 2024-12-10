@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <cassert>
 
 #include "FigureVisitor.h"
 
@@ -16,6 +17,9 @@ class PointIntersectionVisitor : public FigureVisitor {
 
   bool intersects();
 
+  void visit(FigureGroup& group) override {
+    assert(false && "TODO: unimplemented");
+  }
   void visit(RectFigure& rect) override;
   void visit(CircleFigure& circle) override;
 };

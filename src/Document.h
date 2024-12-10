@@ -8,6 +8,7 @@
 
 #include "commands/CommandManager.h"
 #include "figure/Figure.h"
+#include "figure/FigureGroup.h"
 
 class Document {
   inline static std::map<std::filesystem::path, std::shared_ptr<Document>>
@@ -20,7 +21,7 @@ class Document {
   command::CommandManager commandManager;
 
   Vector2 dimensions;
-  std::vector<std::shared_ptr<figure::Figure>> figures;
+  std::shared_ptr<figure::FigureGroup> root;
 
  public:
   static std::shared_ptr<Document> getDocument(

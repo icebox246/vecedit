@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-Document::Document() {}
+Document::Document() : root(std::make_shared<figure::FigureGroup>()) {}
 
 std::shared_ptr<Document> Document::getDocument(
     const std::filesystem::path& path) {
@@ -37,15 +37,15 @@ void Document::setDimenstions(Vector2 newDims) {
 }
 
 const std::vector<std::shared_ptr<figure::Figure>>& Document::getFigures() {
-  return figures;
+  return root->getChildren();
 }
 
 void Document::addFigure(std::shared_ptr<figure::Figure> figure) {
-  figures.emplace_back(std::move(figure));
+  root->addChild(std::move(figure));
 }
 
 void Document::removeFigure(std::shared_ptr<figure::Figure> figure) {
-  figures.erase(std::ranges::find(figures, figure));
+  root->removeChild(std::move(figure));
 }
 
 const std::filesystem::path& Document::getFilePath() {
