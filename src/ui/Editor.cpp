@@ -6,6 +6,7 @@
 #include <ranges>
 #include <utility>
 
+#include "../commands/AddFigureCommand.h"
 #include "../commands/MovePointCommand.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
@@ -237,7 +238,10 @@ void ui::Editor::processModeInsert() {
     auto cursor = getCursorPos();
     newFigure->setOrigin(cursor);
 
-    doc->addFigure(newFigure);
+    auto addCmd = std::make_shared<command::AddFigureCommand>(doc, newFigure);
+    addCmd->execute();
+    doc->getCommandManager().addCommand(addCmd);
+
     selectFigure(newFigure);
 
     TraceLog(

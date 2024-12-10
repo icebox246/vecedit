@@ -31,6 +31,7 @@ class Document {
   void setDimenstions(Vector2 newDims);
   const std::vector<std::shared_ptr<figure::Figure>>& getFigures();
   void addFigure(std::shared_ptr<figure::Figure> figure);
+  void removeFigure(std::shared_ptr<figure::Figure> figure);
   const std::filesystem::path& getFilePath();
 
   command::CommandManager& getCommandManager();

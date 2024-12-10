@@ -44,6 +44,10 @@ void Document::addFigure(std::shared_ptr<figure::Figure> figure) {
   figures.emplace_back(std::move(figure));
 }
 
+void Document::removeFigure(std::shared_ptr<figure::Figure> figure) {
+  figures.erase(std::ranges::find(figures, figure));
+}
+
 const std::filesystem::path& Document::getFilePath() {
   auto it = std::find_if(documents.begin(), documents.end(),
                          [this](auto& p) { return p.second.get() == this; });

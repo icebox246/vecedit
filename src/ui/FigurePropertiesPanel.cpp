@@ -34,6 +34,7 @@ void ui::FigurePropertiesPanel::update() {
     GuiColorPicker(colorPickRect, "Color", &c);
 
     if (!ColorIsEqual(c, oldC)) {
+      // TODO: register a command on mouse up
       switch (colorEditMode) {
         case ColorMode::Fill:
           editedFig->setFill(c);
@@ -72,6 +73,7 @@ void ui::FigurePropertiesPanel::update() {
              std::format("{:.1f}", f).c_str());
 
     if (f != oldF) {
+      // TODO: register a command on mouse up
       editedFig->setStrokeWeight(f);
     }
   }
