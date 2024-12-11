@@ -36,6 +36,10 @@ Document -* Document
 Document *--- "0..n" figure::Figure
 Document *-- command::CommandManager
 
+note right of Document
+  Ta klasa stanowi Multiton
+end note
+
 class command::CommandManager {
   -std::stack<std::shared_ptr<Command>> doneCommands
   -std::stack<std::shared_ptr<Command>> undoneCommands
@@ -122,8 +126,8 @@ command::Command <|-- command::ChangeParentCommand
 command::ChangeParentCommand o-- figure::Figure
 command::ChangeParentCommand o-- figure::FigureGroup
 
-note right of Document
-  Ta klasa stanowi Multiton
+note right of command
+  Klasy zawarte w tej przestrzeni nazw implementują wzorzec Komenda
 end note
 
 abstract figure::Figure {
@@ -145,6 +149,10 @@ abstract figure::Figure {
   +{abstract} float getStrokeWeight()
   +{abstract} void setStrokeWeight(float w)
 }
+
+note right of Figure
+  Ta klasa stanowi komponent w Kompozycie figur
+end note
 
 note right of Figure::clone
   Metoda `clone` pozwala tworzyć kopię obiektu, pozwalając na imlementację Prototypu
