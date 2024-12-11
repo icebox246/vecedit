@@ -30,8 +30,12 @@ class Document {
 
   Vector2 getDimenstions();
   void setDimenstions(Vector2 newDims);
+  std::shared_ptr<figure::FigureGroup> getRoot() { return root; }
+  // TODO: remove
   const std::vector<std::shared_ptr<figure::Figure>>& getFigures();
+  // TODO: remove
   void addFigure(std::shared_ptr<figure::Figure> figure);
+  // TODO: remove
   void removeFigure(std::shared_ptr<figure::Figure> figure);
   const std::filesystem::path& getFilePath();
 

@@ -5,8 +5,11 @@ set separator ::
 class Document {
   -{static} std::map<std::filesystem::path, std::shared_ptr<Document>> documents
 
+  -command::CommandManager commandManager
+
   -Vector2 dimensions
-  -std::vector<std::shared_ptr<figure::Figure>> figures
+  -std::shared_ptr<figure::FigureGroup> root
+  -std::shared_ptr<figure::FigureGroup> selectedGroup
 
   +{static} std::shared_ptr<Document> getDocument(const std::filesystem::path& path)
   +{static} std::vector<std::filesystem::path> getDocumentNames()
@@ -17,18 +20,107 @@ class Document {
 
   +Vector2 getDimenstions()
   +void setDimenstions(Vector2 newDims)
-  +const std::vector<std::shared_ptr<figure::Figure>>& getFigures()
-  +void addFigure(std::shared_ptr<figure::Figure> figure)
+  +std::shared_ptr<figure::FigureRoot> getRoot()
   +const std::filesystem::path& getFilePath()
   +void setFilePath(const std::filesystem::path&)
   +void close()
   +void loadFromFile()
   +void saveToFile()
   +void exportAsBitmap(BitmapFormat format)
+  +command::CommandManager& getCommandManager()
+  +std::shared_ptr<figure::FigureGroup> getSelectedGroup()
+  +void setSelectedGroup(std::shared_ptr<figure::FigureGroup> group)
 }
 
 Document -* Document
 Document *--- "0..n" figure::Figure
+Document *-- command::CommandManager
+
+class command::CommandManager {
+  -std::stack<std::shared_ptr<Command>> doneCommands
+  -std::stack<std::shared_ptr<Command>> undoneCommands
+
+  +void addCommand(std::shared_ptr<Command> newCmd)
+  +void undo()
+  +void redo()
+}
+
+command::CommandManager *-- command::Command
+
+interface command::Command {
+  +{abstract} void execute()
+  +{abstract} void unexecute()
+}
+
+class command::MovePointCommand {
+  -std::shared_ptr<figure::Figure> fig
+  -std::size_t pointId
+  -Vector2 oldPos, newPos
+
+  +MovePointCommand(std::shared_ptr<figure::Figure> fig, std::size_t pointId, Vector2 oldPos, Vector2 newPos)
+
+  +void execute()
+  +void unexecute()
+}
+
+command::Command <|-- command::MovePointCommand
+command::MovePointCommand o-- figure::Figure
+
+class command::AddFigureCommand {
+  -std::shared_ptr<figure::FigureGroup> parent
+  -std::shared_ptr<figure::Figure> fig
+
+  +AddFigureCommand(std::shared_ptr<figure::FigureGroup> parent, std::shared_ptr<figure::Figure> fig)
+
+  +void execute()
+  +void unexecute()
+}
+
+command::Command <|-- command::AddFigureCommand
+command::AddFigureCommand o-- figure::Figure
+command::AddFigureCommand o-- figure::FigureGroup
+
+class command::RemoveFigureCommand {
+  -ParentAndIndex parent
+  -std::shared_ptr<figure::Figure> fig
+
+  +RemoveFigureCommand(std::shared_ptr<figure::FigureGroup> parent, std::shared_ptr<figure::Figure> fig)
+
+  +void execute()
+  +void unexecute()
+}
+
+command::Command <|-- command::RemoveFigureCommand
+command::RemoveFigureCommand o-- figure::Figure
+command::RemoveFigureCommand o-- figure::FigureGroup
+
+class command::ChangeFigurePropsCommand {
+  -std::shared_ptr<figure::Figure> fig
+  -FigureProps oldProps
+  -FigureProps newProps
+
+  +ChangeFigurePropsCommand(std::shared_ptr<figure::Figure> fig, FigureProps oldProps, FigureProps newProps)
+
+  +void execute()
+  +void unexecute()
+}
+
+command::Command <|-- command::ChangeFigurePropsCommand
+command::ChangeFigurePropsCommand o-- figure::Figure
+
+class command::ChangeParentCommand {
+  -ParentAndIndex oldParent, newParent
+  -std::shared_ptr<figure::Figure> fig
+
+  +ChangeParentCommand(std::shared_ptr<figure::Figure> fig, ParentAndIndex oldParent, ParentAndIndex newParent)
+
+  +void execute()
+  +void unexecute()
+}
+
+command::Command <|-- command::ChangeParentCommand
+command::ChangeParentCommand o-- figure::Figure
+command::ChangeParentCommand o-- figure::FigureGroup
 
 note right of Document
   Ta klasa stanowi Multiton
@@ -86,6 +178,35 @@ class figure::FigureBase<FigureType> {
 
 figure::Figure <|-- figure::FigureBase : <<implements>>
 
+class figure::FigureGroup {
+  -std::vector<std::shared_ptr<Figure>> children;
+
+  +void addChild(std::shared_ptr<Figure> figure)
+  +void removeChild(std::shared_ptr<Figure> figure)
+  +const std::vector<std::shared_ptr<Figure>>& getChildren()
+
+  +std::shared_ptr<Figure> clone()
+
+  +Vector2 getOrigin()
+  +void setOrigin(Vector2 newOrigin)
+
+  +void accept(visitor::FigureVisitor& vis)
+
+  +std::shared_ptr<PointEditor> makePointEditor()
+
+  +Color getFill()
+  +void setFill(Color c)
+
+  +Color getStroke()
+  +void setStroke(Color c)
+
+  +float getStrokeWeight()
+  +void setStrokeWeight(float w)
+}
+
+figure::Figure <|-- figure::FigureGroup
+figure::FigureGroup "1" *-- "n" figure::Figure
+
 class figure::CircleFigure {
   -float radius
 
@@ -135,6 +256,18 @@ interface figure::PointEditor {
   {abstract} std::vector<Point> getEditPoints()
   {abstract} void updatePointPosition(std::size_t pointId, Vector2 newPos)
 }
+
+class figure::adapter::GroupPointEditor {
+  -std::shared_ptr<FigureGroup> group;
+
+  +GroupPointEditor(std::shared_ptr<FigureGroup> group)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::GroupPointEditor : <<implement>>
+figure::adapter::GroupPointEditor o-- figure::FigureGroup
 
 class figure::adapter::RectFigurePointEditor {
   -std::shared_ptr<RectFigure> rect
@@ -324,6 +457,7 @@ class ui::Editor {
 
   -std::shared_ptr<FigurePropertiesPanel> propsPanel
   -std::shared_ptr<DocumentPropertiesPanel> docPropsPanel
+  -std::shared_ptr<DocumentHierarchyPanel> docHierPanel
 
   -std::shared_ptr<Strategy<std::filesystem::path>> openStrategy
 
@@ -341,6 +475,8 @@ class ui::Editor {
   +void setCursorIcon(GuiIconName icon)
   +void setOpenStrategy(std::shared_ptr<strategy::Strategy<std::filesystem::path>> newStrategy)
   +void duplicateSelectedFigure()
+  +void undo()
+  +void redo()
 
   -bool isFocused()
   -Vector2 getCursorPos()
@@ -355,6 +491,8 @@ ui::Editor o--- Document
 ui::Editor o--- "1" figure::Figure : holds prototype
 ui::Editor o--- "1" figure::Figure : has selected
 ui::Editor *-- ui::FigurePropertiesPanel
+ui::Editor *-- ui::DocumentPropertiesPanel
+ui::Editor *-- ui::DocumentHierarchyPanel
 ui::Editor o--- ui::strategy::Strategy
 
 class ui::FigurePropertiesPanel {
@@ -379,6 +517,19 @@ class ui::DocumentPropertiesPanel {
 
 ui::Widget <|-- ui::DocumentPropertiesPanel
 ui::DocumentPropertiesPanel o--- "1" Document : edits
+
+class ui::DocumentHierarchyPanel {
+  -std::shared_ptr<Document> editedDoc
+  -std::shared_ptr<figure::Figure> selectedFigure
+
+  +void update()
+
+  +void setDocument(std::shared_ptr<Document> newDoc)
+  +void setSelectedFig(std::shared_ptr<figure::Figure> fig)
+}
+
+ui::Widget <|-- ui::DocumentHierarchyPanel
+ui::DocumentHierarchyPanel o--- "1" Document : edits
 
 class ui::IconButton {
   -GuiIconName icon
@@ -461,5 +612,27 @@ class ui::strategy::DuplicateFigureStrategy {
 
 ui::strategy::Strategy <|-- ui::strategy::DuplicateFigureStrategy : Args... = ()
 ui::strategy::DuplicateFigureStrategy o-- ui::Editor : acts upon
+
+class ui::strategy::UndoStrategy {
+  -std::shared_ptr<Editor> editor
+
+  +UndoStrategy(std::shared_ptr<Editor> editor)
+
+  +void execute()
+}
+
+ui::strategy::Strategy <|-- ui::strategy::UndoStrategy : Args... = ()
+ui::strategy::UndoStrategy o-- ui::Editor : acts upon
+
+class ui::strategy::RedoStrategy {
+  -std::shared_ptr<Editor> editor
+
+  +RedoStrategy(std::shared_ptr<Editor> editor)
+
+  +void execute()
+}
+
+ui::strategy::Strategy <|-- ui::strategy::RedoStrategy : Args... = ()
+ui::strategy::RedoStrategy o-- ui::Editor : acts upon
 
 @enduml
