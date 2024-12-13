@@ -72,7 +72,7 @@
 %\usecolortheme{beaver}
 %\usecolortheme{beetle}
 %\usecolortheme{crane}
-%\usecolortheme{dolphin}
+\usecolortheme{dolphin}
 %\usecolortheme{dove}
 %\usecolortheme{fly}
 %\usecolortheme{lily}
@@ -211,29 +211,37 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 	\frametitle{Kompozyt}
 	
 	\begin{figure}
-		\includegraphics[height=0.7\textheight]{figures/kompozyt.pdf}
+		\includegraphics[width=0.7\textwidth]{figures/kompozyt.pdf}
 	\end{figure}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Kompozyt - opis}
-	%TODO Kompozyt opis
+	Kompozyt to strukturalny wzorzec projektowy pozwalający komponować obiekty w struktury drzewiaste, a następnie traktować te struktury jakby były osobnymi obiektami.
+	
+	\vfill
+	
+	W naszym projekcie pozwala tworzyć hierarchię figur na grafice i w sposób rekurencyjny przetwarzać jej zawartość.
 	
 \end{frame}
 
-\subsection{Multiton}
+\subsection{Metoda wytwórcza}
 
 \begin{frame}
-	\frametitle{Multiton}
+	\frametitle{Metoda wytwórcza}
 	
 	\begin{figure}
-		\includegraphics[height=0.7\textheight]{figures/multiton.pdf}
+		\includegraphics[height=0.7\textheight]{figures/fac.pdf}
 	\end{figure}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Multiton - opis}
-	%TODO Multiton opis
+	\frametitle{Metoda wytwórcza - opis}
+	Metoda wytwórcza jest kreacyjnym wzorcem projektowym, który udostępnia interfejs do tworzenia obiektów w ramach klasy bazowej, ale pozwala podklasom zmieniać typ tworzonych obiektów.
+	
+	\vfill
+	
+	W naszym projekcie metoda wytwórcza używana jest do tworzenia adapterów pozwalających na edycję konkretnych figur.
 	
 \end{frame}
 
@@ -249,7 +257,11 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 
 \begin{frame}
 	\frametitle{Strategia - opis}
-	%TODO Strategia opis
+	Strategia to behawioralny wzorzec projektowy pozwalający zdefiniować rodzinę algorytmów, umieścić je w osobnych klasach i uczynić obiekty tych klas wymienialnymi.
+	
+	\vfill
+	
+	W naszym projekcie używamy jej do opisania akcji, które mają się wydarzyć w sytuacji kiedy użytkownik wciśnie guzik lub skorzysta ze skrótu klawiszowego.
 	
 \end{frame}
 
@@ -265,8 +277,11 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 
 \begin{frame}
 	\frametitle{Adapter - opis}
-	%TODO Adapter opis
+	Adapter jest strukturalnym wzorcem projektowym pozwalającym na współdziałanie ze sobą obiektów o niekompatybilnych interfejsach.
 	
+	\vfill
+	
+	W naszym projekcie tworzy wspólny interfejs do edytowania figur, które mogą posiadać różne własności i wielorakie sposoby ich edycji.
 \end{frame}
 
 \subsection{Odwiedzający}
@@ -281,7 +296,11 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 
 \begin{frame}
 	\frametitle{Odwiedzający}
-	%TODO Adapter opis
+	Odwiedzający to behawioralny wzorzec projektowy pozwalający oddzielić algorytmy od obiektów na których pracują.
+	
+	\vfill
+	
+	W naszym projekcie wzorzec jest użyty do rekurencyjnego przetwarzania figur z różnym sposobem obsługi we zależności od obsługi figury, Pozwala ograniczyć rolę klasy figury tylko do przechowania informacji o kształcie figury.
 	
 \end{frame}
 
@@ -289,7 +308,6 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 
 \begin{frame}
 	\frametitle{Prototyp}
-	%TODO Prototyp zdjęcie
 	\begin{figure}
 		\includegraphics[width=0.7\textwidth]{figures/prototyp.pdf}
 	\end{figure}
@@ -297,16 +315,20 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 
 \begin{frame}
 	\frametitle{Prototyp - opis}
-	%TODO Prototyp opis
-
+	Prototyp to kreacyjny wzorzec projektowy, który umożliwia kopiowanie już istniejących obiektów bez tworzenia zależności pomiędzy twoim kodem, a klasami obiektów.
+	
+	\vfill
+	
+	W naszym projekcie prototyp pozwala na tworzenie nowych figur w oparciu o zdefiniowane wzorcowe figury
 \end{frame}
 
 %------------------------------------------------
 
-\section{Prototyp}
+\section{Początkowa implementacja}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Ekran startowy}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro1.png}
@@ -314,7 +336,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Tworzenie pliku}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro2.png}
@@ -322,7 +345,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Dodanie figury}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro3.png}
@@ -330,7 +354,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Edycja figury}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro4.png}
@@ -338,7 +363,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Dodanie kolejnej figury}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro5.png}
@@ -346,7 +372,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Nakładanie się figur}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro6.png}
@@ -354,7 +381,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Zmiany parametrów figur}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro7.png}
@@ -362,7 +390,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Zmiany parametrów figur}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro8.png}
@@ -370,7 +399,8 @@ Aplikacja umożliwia zapisywanie projektów w formacie wektorowym (np. SVG) oraz
 \end{frame}
 
 \begin{frame}
-	\frametitle{Prototyp}
+	\frametitle{Początkowa implementacja}
+	\framesubtitle{Zmiany parametrów figur}
 	
 	\begin{figure}
 		\includegraphics[height=0.7\textheight]{figures/pro9.png}
