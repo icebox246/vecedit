@@ -119,6 +119,8 @@ void ui::Editor::setDocument(std::shared_ptr<Document> newDoc) {
 
   if (!oldDoc)
     resetCamera();
+
+  propsPanel->setDocument(doc);
 }
 
 void ui::Editor::resetCamera() {

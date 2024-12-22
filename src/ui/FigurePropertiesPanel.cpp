@@ -5,12 +5,18 @@
 #include <format>
 
 void ui::FigurePropertiesPanel::update() {
-  GuiPanel(rect, "Properties");
+  GuiPanel(rect, "Figure properties");
   if (!editedFig) {
     auto r = Rectangle{rect.x + 10, rect.y + 20, rect.width - 20, 40};
 
     GuiLabel(r, GuiIconText(ICON_CURSOR_CLASSIC, "Select a figure"));
     return;
+  }
+
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    startFigProps =
+        command::ChangeFigurePropsCommand::FigureProps::makePropsFromFig(
+            *editedFig);
   }
 
   {
@@ -34,7 +40,6 @@ void ui::FigurePropertiesPanel::update() {
     GuiColorPicker(colorPickRect, "Color", &c);
 
     if (!ColorIsEqual(c, oldC)) {
-      // TODO: register a command on mouse up
       switch (colorEditMode) {
         case ColorMode::Fill:
           editedFig->setFill(c);
@@ -43,6 +48,8 @@ void ui::FigurePropertiesPanel::update() {
           editedFig->setStroke(c);
           break;
       }
+
+      uncommitedChanges = true;
     }
   }
 
@@ -73,13 +80,34 @@ void ui::FigurePropertiesPanel::update() {
              std::format("{:.1f}", f).c_str());
 
     if (f != oldF) {
-      // TODO: register a command on mouse up
       editedFig->setStrokeWeight(f);
+      uncommitedChanges = true;
     }
   }
+
+  if (uncommitedChanges && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+    registerChangePropsCommand();
+    uncommitedChanges = false;
+  }
+}
+
+void ui::FigurePropertiesPanel::setDocument(std::shared_ptr<Document> doc) {
+  this->doc = std::move(doc);
 }
 
 void ui::FigurePropertiesPanel::setFigure(
     std::shared_ptr<figure::Figure> newFig) {
   editedFig = std::move(newFig);
+  uncommitedChanges = false;
+}
+
+void ui::FigurePropertiesPanel::registerChangePropsCommand() {
+  TraceLog(LOG_INFO, "Registering change props command");
+  assert(doc);
+  auto endProps =
+      command::ChangeFigurePropsCommand::FigureProps::makePropsFromFig(
+          *editedFig);
+  doc->getCommandManager().addCommand(
+      std::make_shared<command::ChangeFigurePropsCommand>(
+          editedFig, startFigProps, endProps));
 }
