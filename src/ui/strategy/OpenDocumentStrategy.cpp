@@ -8,8 +8,6 @@ ui::strategy::OpenDocumentStrategy::OpenDocumentStrategy(
   assert(editor);
 }
 
-void ui::strategy::OpenDocumentStrategy::execute(std::filesystem::path docName) {
-  auto doc = Document::getDocument(docName);
-
+void ui::strategy::OpenDocumentStrategy::execute(std::shared_ptr<Document> doc) {
   editor->setDocument(std::move(doc));
 }

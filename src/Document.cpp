@@ -8,14 +8,19 @@ std::shared_ptr<Document> Document::getDocument(
     const std::filesystem::path& path) {
   const auto absPath = std::filesystem::absolute(path);
 
-  if (documents.contains(absPath)) {
-    return documents.at(absPath);
+  if (auto it =
+          std::find_if(documents.begin(), documents.end(),
+                       [&path](auto& d) { return d->getFilePath() == path; });
+      it != documents.end()) {
+    return *it;
   } else {
-    auto [it, _] = documents.emplace(
-        absPath, new Document());  // This is not a good way to allocate shared
-                                   // objects, but to force multiton behaviour
-                                   // it had to be done this way
-    return it->second;
+    // This is not a good way to allocate shared
+    // objects, but to force multiton behaviour
+    // it had to be done this way
+    auto doc = std::shared_ptr<Document>(new Document());
+    doc->filepath = path;
+    documents.push_back(doc);
+    return doc;
   }
 }
 
@@ -23,7 +28,7 @@ std::vector<std::filesystem::path> Document::getDocumentNames() {
   std::vector<std::filesystem::path> result;
 
   std::ranges::transform(documents, std::back_inserter(result),
-                         [](auto& p) { return p.first; });
+                         [](auto& d) { return d->getFilePath(); });
 
   return result;
 }
@@ -49,10 +54,7 @@ void Document::removeFigure(std::shared_ptr<figure::Figure> figure) {
 }
 
 const std::filesystem::path& Document::getFilePath() {
-  auto it = std::find_if(documents.begin(), documents.end(),
-                         [this](auto& p) { return p.second.get() == this; });
-
-  return it->first;
+  return filepath;
 }
 
 command::CommandManager& Document::getCommandManager() {

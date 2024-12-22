@@ -2,7 +2,6 @@
 
 #include <raylib.h>
 #include <filesystem>
-#include <map>
 #include <memory>
 #include <vector>
 
@@ -11,8 +10,7 @@
 #include "figure/FigureGroup.h"
 
 class Document {
-  inline static std::map<std::filesystem::path, std::shared_ptr<Document>>
-      documents;
+  inline static std::vector<std::shared_ptr<Document>> documents;
 
   Document();
   Document(const Document&) = default;
@@ -20,6 +18,7 @@ class Document {
 
   command::CommandManager commandManager;
 
+  std::filesystem::path filepath;
   Vector2 dimensions;
   std::shared_ptr<figure::FigureGroup> root;
 
@@ -38,6 +37,13 @@ class Document {
   // TODO: remove
   void removeFigure(std::shared_ptr<figure::Figure> figure);
   const std::filesystem::path& getFilePath();
+
+  void close() {
+    auto it = std::ranges::find_if(documents.begin(), documents.end(),
+                                   [this](auto& d) { return d.get() == this; });
+    assert(it != documents.end() && "Cannot close closed document");
+    documents.erase(it);
+  }
 
   command::CommandManager& getCommandManager();
 };
