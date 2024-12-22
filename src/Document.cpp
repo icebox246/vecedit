@@ -41,18 +41,6 @@ void Document::setDimenstions(Vector2 newDims) {
   dimensions = newDims;
 }
 
-const std::vector<std::shared_ptr<figure::Figure>>& Document::getFigures() {
-  return root->getChildren();
-}
-
-void Document::addFigure(std::shared_ptr<figure::Figure> figure) {
-  root->addChild(std::move(figure));
-}
-
-void Document::removeFigure(std::shared_ptr<figure::Figure> figure) {
-  root->removeChild(std::move(figure));
-}
-
 const std::filesystem::path& Document::getFilePath() {
   return filepath;
 }

@@ -18,9 +18,9 @@ class AddFigureCommand : public Command {
       : doc(std::move(doc)), fig(std::move(fig)) {}
   ~AddFigureCommand() override = default;
 
-  void execute() override { doc->addFigure(fig); }
+  void execute() override { doc->getRoot()->addChild(fig); }
 
-  void unexecute() override { doc->removeFigure(fig); }
+  void unexecute() override { doc->getRoot()->removeChild(fig); }
 };
 
 }  // namespace command

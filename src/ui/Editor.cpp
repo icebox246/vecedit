@@ -54,9 +54,7 @@ void ui::Editor::update() {
     DrawRectangleV({0, 0}, doc->getDimenstions(), WHITE);
 
     auto renderer = figure::visitor::RendererVisitor();
-    for (const auto& f : doc->getFigures()) {
-      f->accept(renderer);
-    }
+    doc->getRoot()->accept(renderer);
   }
 
   switch (mode) {
@@ -213,21 +211,14 @@ void ui::Editor::processModeSelect() {
   }
 
   if (!clickHandled && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-    bool selectionFound = false;
-
     figure::visitor::PointIntersectionVisitor intersectionVisitor(cursor);
-    for (auto fig : std::ranges::reverse_view(doc->getFigures())) {
-      fig->accept(intersectionVisitor);
+    doc->getRoot()->accept(intersectionVisitor);
 
-      if (intersectionVisitor.intersects()) {
-        selectFigure(fig);
-        selectionFound = true;
-        break;
-      }
-    }
-
-    if (!selectionFound)
+    if (intersectionVisitor.intersects()) {
+      selectFigure(intersectionVisitor.getIntersectingFigure());
+    } else {
       selectFigure(nullptr);
+    }
   }
 }
 

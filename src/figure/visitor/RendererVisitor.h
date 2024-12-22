@@ -9,11 +9,9 @@ class RendererVisitor : public FigureVisitor {
  public:
   virtual ~RendererVisitor() = default;
 
-  void visit(FigureGroup& group) override {
-    assert(false && "TODO: unimplemented");
-  }
-  void visit(RectFigure& rect) override;
-  void visit(CircleFigure& circle) override;
+  void visit(std::shared_ptr<FigureGroup> group) override;
+  void visit(std::shared_ptr<RectFigure> rect) override;
+  void visit(std::shared_ptr<CircleFigure> circle) override;
 };
 
 }  // namespace figure::visitor

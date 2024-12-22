@@ -21,6 +21,11 @@ class ChangeFigurePropsCommand : public Command {
           .strokeWeight = fig.getStrokeWeight(),
       };
     }
+
+    bool operator==(const FigureProps& o) const {
+      return ColorIsEqual(fill, o.fill) && ColorIsEqual(stroke, o.stroke) &&
+             strokeWeight == o.strokeWeight;
+    }
   };
 
  private:

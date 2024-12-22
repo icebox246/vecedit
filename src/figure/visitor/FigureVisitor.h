@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace figure {
 
 class FigureGroup;
@@ -14,9 +16,9 @@ class FigureVisitor {
  public:
   virtual ~FigureVisitor() = default;
 
-  virtual void visit(FigureGroup& rect) = 0;
-  virtual void visit(RectFigure& rect) = 0;
-  virtual void visit(CircleFigure& circle) = 0;
+  virtual void visit(std::shared_ptr<FigureGroup> rect) = 0;
+  virtual void visit(std::shared_ptr<RectFigure> rect) = 0;
+  virtual void visit(std::shared_ptr<CircleFigure> circle) = 0;
 };
 
 }  // namespace figure::visitor

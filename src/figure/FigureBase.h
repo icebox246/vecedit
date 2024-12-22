@@ -27,9 +27,8 @@ class FigureBase : public Figure,
   void setOrigin(Vector2 newOrigin) override { origin = newOrigin; }
 
   void accept(visitor::FigureVisitor& vis) override {
-    auto* self = dynamic_cast<FigureType*>(this);
-    assert(self);
-    vis.visit(*self);
+    auto ptr = FigureType::shared_from_this();
+    vis.visit(ptr);
   }
 
   Color getFill() override { return fill; }

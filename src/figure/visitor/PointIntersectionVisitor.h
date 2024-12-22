@@ -2,26 +2,27 @@
 
 #include <raylib.h>
 #include <cassert>
+#include <memory>
 
+#include "../Figure.h"
 #include "FigureVisitor.h"
 
 namespace figure::visitor {
 
 class PointIntersectionVisitor : public FigureVisitor {
   Vector2 point;
-  bool gotIntersection = false;
+  std::shared_ptr<figure::Figure> intersectingFigure;
 
  public:
   PointIntersectionVisitor(Vector2 point);
   virtual ~PointIntersectionVisitor() = default;
 
   bool intersects();
+  std::shared_ptr<figure::Figure> getIntersectingFigure();
 
-  void visit(FigureGroup& group) override {
-    assert(false && "TODO: unimplemented");
-  }
-  void visit(RectFigure& rect) override;
-  void visit(CircleFigure& circle) override;
+  void visit(std::shared_ptr<FigureGroup> group) override;
+  void visit(std::shared_ptr<RectFigure> rect) override;
+  void visit(std::shared_ptr<CircleFigure> circle) override;
 };
 
 }  // namespace figure::visitor

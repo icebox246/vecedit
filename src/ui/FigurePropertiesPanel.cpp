@@ -107,6 +107,10 @@ void ui::FigurePropertiesPanel::registerChangePropsCommand() {
   auto endProps =
       command::ChangeFigurePropsCommand::FigureProps::makePropsFromFig(
           *editedFig);
+
+  if (startFigProps == endProps)
+    return;
+
   doc->getCommandManager().addCommand(
       std::make_shared<command::ChangeFigurePropsCommand>(
           editedFig, startFigProps, endProps));
