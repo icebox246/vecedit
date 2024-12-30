@@ -10,6 +10,7 @@
 #include "strategy/NewDocumentStrategy.h"
 #include "strategy/OpenDocumentStrategy.h"
 #include "strategy/RedoStrategy.h"
+#include "strategy/SaveDocumentStrategy.h"
 #include "strategy/SetFigureInsertStrategy.h"
 #include "strategy/SetSelectStrategy.h"
 #include "strategy/UndoStrategy.h"
@@ -19,6 +20,7 @@ ui::AppUi::AppUi()
       toolbar(std::make_shared<Toolbar>()),
       editor(std::make_shared<Editor>()) {
   auto newDocButton = std::make_shared<IconButton>(ICON_FILE_ADD);
+  auto saveDocButton = std::make_shared<IconButton>(ICON_FILE_SAVE_CLASSIC);
   auto undoButton = std::make_shared<IconButton>(ICON_UNDO);
   auto redoButton = std::make_shared<IconButton>(ICON_REDO);
 
@@ -31,6 +33,13 @@ ui::AppUi::AppUi()
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
 
     newDocButton->setStrategy(newDocStrat);
+  }
+
+  {
+    auto saveDocStrat =
+        std::make_shared<strategy::SaveDocumentStrategy>(editor);
+
+    saveDocButton->setStrategy(saveDocStrat);
   }
 
   {
@@ -84,6 +93,7 @@ ui::AppUi::AppUi()
   }
 
   toolbar->addWidget(std::move(newDocButton));
+  toolbar->addWidget(std::move(saveDocButton));
   toolbar->addWidget(std::move(undoButton));
   toolbar->addWidget(std::move(redoButton));
   toolbar->addWidget(nullptr);

@@ -34,6 +34,7 @@ set(SOURCE
     src/ui/FigurePropertiesPanel.cpp
     
     src/ui/strategy/NewDocumentStrategy.cpp
+    src/ui/strategy/SaveDocumentStrategy.cpp
     src/ui/strategy/OpenDocumentStrategy.cpp
     src/ui/strategy/SetFigureInsertStrategy.cpp
     src/ui/strategy/SetSelectStrategy.cpp
@@ -43,6 +44,7 @@ set(SOURCE
     
     src/figure/visitor/RendererVisitor.cpp
     src/figure/visitor/PointIntersectionVisitor.cpp
+    src/figure/visitor/SvgSerializerVisitor.cpp
     
     src/figure/adapter/RectFigurePointEditor.cpp
     src/figure/adapter/CircleFigurePointEditor.cpp
