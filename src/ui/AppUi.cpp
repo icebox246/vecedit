@@ -94,6 +94,7 @@ ui::AppUi::AppUi()
 
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
+  toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(undoButton));
   toolbar->addWidget(std::move(redoButton));
   toolbar->addWidget(nullptr);
