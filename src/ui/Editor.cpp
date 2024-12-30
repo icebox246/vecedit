@@ -3,13 +3,13 @@
 #include <raygui.h>
 #include <raymath.h>
 #include <format>
-#include <ranges>
 #include <utility>
 
 #include "../commands/AddFigureCommand.h"
 #include "../commands/MovePointCommand.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
+#include "../figure/visitor/SvgSerializerVisitor.h"
 #include "../util.h"
 
 namespace {
@@ -257,4 +257,15 @@ void ui::Editor::undo() {
 void ui::Editor::redo() {
   if (doc)
     doc->getCommandManager().redo();
+}
+
+void ui::Editor::saveDocument() {
+  if (!doc)
+    return;
+
+  figure::visitor::SvgSerializerVisitor serializer(doc->getDimenstions());
+
+  doc->getRoot()->accept(serializer);
+
+  serializer.saveToFile(doc->getFilePath());
 }

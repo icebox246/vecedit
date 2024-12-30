@@ -19,8 +19,10 @@ void figure::visitor::RendererVisitor::visit(std::shared_ptr<RectFigure> rect) {
 
 void figure::visitor::RendererVisitor::visit(
     std::shared_ptr<CircleFigure> circle) {
-  DrawCircleV(circle->getOrigin(), circle->getRadius(), circle->getStroke());
   DrawCircleV(circle->getOrigin(),
-              circle->getRadius() - circle->getStrokeWeight(),
+              circle->getRadius() + circle->getStrokeWeight() * 0.5f,
+              circle->getStroke());
+  DrawCircleV(circle->getOrigin(),
+              circle->getRadius() - circle->getStrokeWeight() * 0.5f,
               circle->getFill());
 }
