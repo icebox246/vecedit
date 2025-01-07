@@ -31,6 +31,8 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
 
   GuiIconName cursorIcon = ICON_NONE;
 
+  bool useGrid = false;
+
  public:
   Editor();
   ~Editor() override = default;
@@ -54,12 +56,15 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   void saveDocument();
 
   void selectFigure(std::shared_ptr<figure::Figure> figure, bool multi = false);
+  void toggleGrid();
 
  private:
   bool isFocused();
   Vector2 getCursorPos();
+  Vector2 getSnappedCursorPos();
   void processModeSelect();
   void processModeInsert();
+  void drawGrid();
 };
 
 }  // namespace ui

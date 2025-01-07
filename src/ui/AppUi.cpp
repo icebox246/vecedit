@@ -40,6 +40,8 @@ ui::AppUi::AppUi()
   auto removeFigureButton = std::make_shared<IconButton>(ICON_FILE_DELETE);
   auto dupFigureButton = std::make_shared<IconButton>(ICON_FILE_COPY);
 
+  auto gridButton = std::make_shared<IconButton>(ICON_GRID);
+
   {
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
 
@@ -170,6 +172,13 @@ ui::AppUi::AppUi()
     dupFigureButton->setStrategy(removeStrat);
   }
 
+  {
+    auto gridStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->toggleGrid(); });
+
+    gridButton->setStrategy(gridStrat);
+  }
+
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
   toolbar->addWidget(nullptr);
@@ -189,6 +198,8 @@ ui::AppUi::AppUi()
   toolbar->addWidget(std::move(moveHigherButton));
   toolbar->addWidget(std::move(removeFigureButton));
   toolbar->addWidget(std::move(dupFigureButton));
+  toolbar->addWidget(nullptr);
+  toolbar->addWidget(std::move(gridButton));
 }
 
 void ui::AppUi::update() {

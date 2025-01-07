@@ -20,6 +20,8 @@
 namespace {
 constexpr auto PropsPanelWidth = 300;
 constexpr auto HierarchyPanelWidth = 200;
+
+constexpr auto GridSpacing = 5;
 }  // namespace
 
 ui::Editor::Editor()
@@ -64,6 +66,8 @@ void ui::Editor::update() {
   {
     DrawRectangleV({5, 5}, doc->getDimenstions(), DARKGRAY);
     DrawRectangleV({0, 0}, doc->getDimenstions(), WHITE);
+    if (useGrid)
+      drawGrid();
 
     auto renderer = figure::visitor::RendererVisitor();
     doc->getRoot()->accept(renderer);
@@ -172,6 +176,17 @@ Vector2 ui::Editor::getCursorPos() {
   return mouse;
 }
 
+Vector2 ui::Editor::getSnappedCursorPos() {
+  auto cursor = getCursorPos();
+  if (!useGrid)
+    return cursor;
+
+  return {
+      roundf(cursor.x / GridSpacing) * GridSpacing,
+      roundf(cursor.y / GridSpacing) * GridSpacing,
+  };
+}
+
 void ui::Editor::processModeSelect() {
   if (!isFocused())
     return;
@@ -225,7 +240,7 @@ void ui::Editor::processModeSelect() {
       DrawCircleLinesV(p.pos, radius, stroke);
 
       if (draggedPointId == p.id) {
-        pointEditor->updatePointPosition(p.id, cursor);
+        pointEditor->updatePointPosition(p.id, getSnappedCursorPos());
       }
     }
   }
@@ -249,7 +264,7 @@ void ui::Editor::processModeInsert() {
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
     auto newFigure = figurePrototype->clone();
-    auto cursor = getCursorPos();
+    auto cursor = getSnappedCursorPos();
     newFigure->setOrigin(cursor);
 
     // TODO: support other parents than root of document
@@ -389,4 +404,18 @@ void ui::Editor::saveDocument() {
   doc->getRoot()->accept(serializer);
 
   serializer.saveToFile(doc->getFilePath());
+}
+
+void ui::Editor::toggleGrid() {
+  useGrid = !useGrid;
+}
+
+void ui::Editor::drawGrid() {
+  for (int x = 0; x < doc->getDimenstions().x; x += GridSpacing) {
+    DrawLine(x, 0, x, doc->getDimenstions().y, LIGHTGRAY);
+  }
+
+  for (int y = 0; y < doc->getDimenstions().y; y += GridSpacing) {
+    DrawLine(0, y, doc->getDimenstions().x, y, LIGHTGRAY);
+  }
 }

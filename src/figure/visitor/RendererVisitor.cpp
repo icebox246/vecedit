@@ -22,8 +22,13 @@ void figure::visitor::RendererVisitor::visit(
 
 void figure::visitor::RendererVisitor::visit(std::shared_ptr<RectFigure> rect) {
   DrawRectangleRec(rect->getRectangle(), rect->getFill());
-  DrawRectangleLinesEx(rect->getRectangle(), rect->getStrokeWeight(),
-                       rect->getStroke());
+  auto outerRect = rect->getRectangle();
+  auto sw = rect->getStrokeWeight();
+  outerRect.x -= sw * 0.5f;
+  outerRect.y -= sw * 0.5f;
+  outerRect.width += sw;
+  outerRect.height += sw;
+  DrawRectangleLinesEx(outerRect, sw, rect->getStroke());
 }
 
 void figure::visitor::RendererVisitor::visit(
