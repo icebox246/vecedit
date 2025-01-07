@@ -49,6 +49,7 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   void ungroupFigures();
   void changeFigureOrder(int delta);
   void removeFigure();
+  void duplicateFigure();
 
   void saveDocument();
 

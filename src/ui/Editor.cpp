@@ -5,7 +5,7 @@
 #include <format>
 #include <utility>
 
-#include "../commands/AddFigureCommand.h"
+#include "../commands/AddFiguresCommand.h"
 #include "../commands/ChangeOrderCommand.h"
 #include "../commands/GroupFiguresCommand.h"
 #include "../commands/MovePointCommand.h"
@@ -253,8 +253,8 @@ void ui::Editor::processModeInsert() {
     newFigure->setOrigin(cursor);
 
     // TODO: support other parents than root of document
-    auto addCmd =
-        std::make_shared<command::AddFigureCommand>(doc->getRoot(), newFigure);
+    auto addCmd = std::make_shared<command::AddFiguresCommand>(
+        doc->getRoot(), std::vector{newFigure});
     addCmd->execute();
     doc->getCommandManager().addCommand(addCmd);
 
@@ -355,6 +355,29 @@ void ui::Editor::removeFigure() {
   doc->getCommandManager().addAndExecCommand(std::move(command));
 
   selectFigure(nullptr);
+}
+
+void ui::Editor::duplicateFigure() {
+  if (!selectedFigure || !doc)
+    return;
+
+  std::vector figures = transientGroup
+                            ? std::dynamic_pointer_cast<figure::FigureGroup>(
+                                  transientGroup->clone())
+                                  ->getChildren()
+                            : std::vector{selectedFigure->clone()};
+  for (auto fig : figures)
+    fig->setOrigin(fig->getOrigin() + Vector2{20, 20});
+
+  auto command = std::make_shared<command::AddFiguresCommand>(
+      figures[0]->getParent(), figures);
+
+  doc->getCommandManager().addAndExecCommand(std::move(command));
+
+  selectFigure(nullptr);
+
+  for (auto fig : figures)
+    selectFigure(fig, true);
 }
 
 void ui::Editor::saveDocument() {
