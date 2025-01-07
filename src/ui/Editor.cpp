@@ -9,6 +9,7 @@
 #include "../commands/ChangeOrderCommand.h"
 #include "../commands/GroupFiguresCommand.h"
 #include "../commands/MovePointCommand.h"
+#include "../commands/UngroupFiguresCommand.h"
 #include "../figure/Figure.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
@@ -316,6 +317,20 @@ void ui::Editor::groupFigures() {
   doc->getCommandManager().addAndExecCommand(std::move(groupCmd));
 
   selectFigure(std::move(transientGroup));
+}
+
+void ui::Editor::ungroupFigures() {
+  if (!selectedFigure || transientGroup)
+    return;
+
+  if (auto group =
+          std::dynamic_pointer_cast<figure::FigureGroup>(selectedFigure)) {
+    auto ungroupCmd = std::make_shared<command::UngroupFiguresCommand>(group);
+
+    doc->getCommandManager().addAndExecCommand(std::move(ungroupCmd));
+
+    selectFigure(nullptr);
+  }
 }
 
 void ui::Editor::changeFigureOrder(int delta) {

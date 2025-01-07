@@ -106,6 +106,13 @@ ui::AppUi::AppUi()
   }
 
   {
+    auto ungroupStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->ungroupFigures(); });
+
+    ungroupButton->setStrategy(ungroupStrat);
+  }
+
+  {
     auto moveLowerStrat = std::make_shared<strategy::FunctorStrategy<>>(
         [this]() { editor->changeFigureOrder(-1); });
 
