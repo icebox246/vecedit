@@ -43,6 +43,8 @@ class Editor : Widget {
   void undo();
   void redo();
 
+  void saveDocument();
+
  private:
   bool isFocused();
   Vector2 getCursorPos();
