@@ -83,8 +83,16 @@ void FigureGroup::addChild(std::shared_ptr<Figure> figure) {
   children.emplace_back(std::move(figure));
 }
 
+void FigureGroup::addChild(std::shared_ptr<Figure> figure, std::size_t index) {
+  children.insert(children.begin() + index, std::move(figure));
+}
+
 void FigureGroup::removeChild(std::shared_ptr<Figure> figure) {
   children.erase(std::ranges::find(children, figure));
+}
+
+std::size_t figure::FigureGroup::getChildIndex(std::shared_ptr<Figure> figure) {
+  return std::distance(children.begin(), std::ranges::find(children, figure));
 }
 
 const std::vector<std::shared_ptr<Figure>>& FigureGroup::getChildren() {

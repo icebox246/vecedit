@@ -16,6 +16,7 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
   const std::unordered_set<std::shared_ptr<figure::Figure>>& markedFigures;
   std::shared_ptr<figure::Figure>& figureToSelect;
   Vector2 offset{0, 0};
+  int indentLevel = 0;
 
  public:
   HierarchyTreeRendererVisitor(
@@ -28,14 +29,13 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
 
   void visit(std::shared_ptr<FigureGroup> group) override {
     simpleFigVisit(group, "Group");
-    DrawLine(rect.x + 4 + offset.x, rect.y + offset.y, rect.x + 4 + offset.x,
-             rect.y + offset.y + ItemHeight * group->getChildren().size(),
-             GRAY);
+    indentLevel++;
     offset.x += IndentWidth;
     for (auto c : group->getChildren()) {
       c->accept(*this);
     }
     offset.x -= IndentWidth;
+    indentLevel--;
   }
 
   void visit(std::shared_ptr<RectFigure> rect) override {
@@ -56,6 +56,12 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
     if (markedFigures.contains(fig)) {
       DrawRectangleLinesEx(r, 1, SKYBLUE);
     }
+    for (int i = 0; i < indentLevel; i++) {
+      DrawLine(rect.x + 4 + IndentWidth * i, rect.y + offset.y,
+               rect.x + 4 + IndentWidth * i, rect.y + offset.y + ItemHeight,
+               GRAY);
+    }
+
     offset.y += ItemHeight;
   }
 };

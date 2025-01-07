@@ -37,7 +37,11 @@ class FigureGroup : public Figure,
 
   void addChild(std::shared_ptr<Figure> figure);
 
+  void addChild(std::shared_ptr<Figure> figure, std::size_t index);
+
   void removeChild(std::shared_ptr<Figure> figure);
+
+  std::size_t getChildIndex(std::shared_ptr<Figure> figure);
 
   const std::vector<std::shared_ptr<Figure>>& getChildren();
 

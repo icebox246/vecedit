@@ -7,6 +7,7 @@
 #include "../figure/RectFigure.h"
 #include "DocumentTabs.h"
 #include "IconButton.h"
+#include "strategy/FunctorStrategy.h"
 #include "strategy/NewDocumentStrategy.h"
 #include "strategy/OpenDocumentStrategy.h"
 #include "strategy/RedoStrategy.h"
@@ -28,6 +29,9 @@ ui::AppUi::AppUi()
 
   auto insertRectButton = std::make_shared<IconButton>(ICON_PLAYER_STOP);
   auto insertCircleButton = std::make_shared<IconButton>(ICON_PLAYER_RECORD);
+
+  auto groupButton = std::make_shared<IconButton>(ICON_LINK);
+  auto ungroupButton = std::make_shared<IconButton>(ICON_LINK_BROKE);
 
   {
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
@@ -92,6 +96,13 @@ ui::AppUi::AppUi()
     insertCircleButton->setStrategy(setCircleStrat);
   }
 
+  {
+    auto groupStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->groupFigures(); });
+
+    groupButton->setStrategy(groupStrat);
+  }
+
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
   toolbar->addWidget(nullptr);
@@ -102,6 +113,9 @@ ui::AppUi::AppUi()
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(insertRectButton));
   toolbar->addWidget(std::move(insertCircleButton));
+  toolbar->addWidget(nullptr);
+  toolbar->addWidget(std::move(groupButton));
+  toolbar->addWidget(std::move(ungroupButton));
 }
 
 void ui::AppUi::update() {

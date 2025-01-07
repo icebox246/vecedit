@@ -45,6 +45,7 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   void setCursorIcon(GuiIconName icon);
   void undo();
   void redo();
+  void groupFigures();
 
   void saveDocument();
 

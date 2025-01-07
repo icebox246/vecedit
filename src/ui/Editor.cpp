@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "../commands/AddFigureCommand.h"
+#include "../commands/GroupFiguresCommand.h"
 #include "../commands/MovePointCommand.h"
 #include "../figure/Figure.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
@@ -302,6 +303,18 @@ void ui::Editor::undo() {
 void ui::Editor::redo() {
   if (doc)
     doc->getCommandManager().redo();
+}
+
+void ui::Editor::groupFigures() {
+  if (!transientGroup || !doc)
+    return;
+
+  auto groupCmd = std::make_shared<command::GroupFiguresCommand>(
+      transientGroup->getChildren().front()->getParent(), transientGroup);
+
+  doc->getCommandManager().addAndExecCommand(std::move(groupCmd));
+
+  selectFigure(std::move(transientGroup));
 }
 
 void ui::Editor::saveDocument() {
