@@ -222,13 +222,16 @@ void ui::Editor::processModeSelect() {
           break;
       }
 
-      auto radius = 5 / camera.zoom;
+      auto radius = 8 / camera.zoom;
 
-      DrawCircleV(p.pos, radius, fill);
+      fill.a = 100;
 
       Color stroke = BLACK;
+      stroke.a = 150;
+
       if (Vector2DistanceSqr(p.pos, cursor) <= radius * radius) {
-        stroke = YELLOW;
+        stroke.a = 200;
+        fill.a = 255;
 
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
           clickHandled = true;
@@ -237,7 +240,9 @@ void ui::Editor::processModeSelect() {
         }
       }
 
-      DrawCircleLinesV(p.pos, radius, stroke);
+      DrawCircleV(p.pos, radius, stroke);
+      DrawCircleV(p.pos, radius * 0.8, ColorAlpha(WHITE, 0.6));
+      DrawCircleV(p.pos, radius * 0.8, fill);
 
       if (draggedPointId == p.id) {
         pointEditor->updatePointPosition(p.id, getSnappedCursorPos());
