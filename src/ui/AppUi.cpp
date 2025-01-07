@@ -24,6 +24,8 @@ ui::AppUi::AppUi()
       editor(std::make_shared<Editor>()) {
   auto newDocButton = std::make_shared<IconButton>(ICON_FILE_ADD);
   auto saveDocButton = std::make_shared<IconButton>(ICON_FILE_SAVE_CLASSIC);
+  auto exportDocButton = std::make_shared<IconButton>(ICON_FILETYPE_IMAGE);
+
   auto undoButton = std::make_shared<IconButton>(ICON_UNDO);
   auto redoButton = std::make_shared<IconButton>(ICON_REDO);
 
@@ -56,6 +58,14 @@ ui::AppUi::AppUi()
 
     saveDocButton->setStrategy(saveDocStrat);
     addShortcut(saveDocStrat, KEY_S, keyboardShortcutMod());
+  }
+
+  {
+    auto exportStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->exportDocument("png"); });
+
+    exportDocButton->setStrategy(exportStrat);
+    addShortcut(exportStrat, KEY_E, keyboardShortcutMod());
   }
 
   {
@@ -95,6 +105,7 @@ ui::AppUi::AppUi()
     auto setRectStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
         editor, rect, ICON_PLAYER_STOP);
 
+    insertRectButton->setStrategy(setRectStrat);
     addShortcut(setRectStrat, KEY_R);
   }
 
@@ -199,6 +210,7 @@ ui::AppUi::AppUi()
 
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
+  toolbar->addWidget(std::move(exportDocButton));
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(undoButton));
   toolbar->addWidget(std::move(redoButton));

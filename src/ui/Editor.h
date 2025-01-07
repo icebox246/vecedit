@@ -54,6 +54,7 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   void duplicateFigure();
 
   void saveDocument();
+  void exportDocument(std::string format);
 
   void selectFigure(std::shared_ptr<figure::Figure> figure, bool multi = false);
   void toggleGrid();

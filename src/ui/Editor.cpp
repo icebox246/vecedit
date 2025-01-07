@@ -12,6 +12,7 @@
 #include "../commands/RemoveFiguresCommand.h"
 #include "../commands/UngroupFiguresCommand.h"
 #include "../figure/Figure.h"
+#include "../figure/visitor/BitmapRendererVisitor.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
 #include "../figure/visitor/SvgSerializerVisitor.h"
@@ -409,6 +410,20 @@ void ui::Editor::saveDocument() {
   doc->getRoot()->accept(serializer);
 
   serializer.saveToFile(doc->getFilePath());
+}
+
+void ui::Editor::exportDocument(std::string format) {
+  if (!doc)
+    return;
+
+  figure::visitor::BitmapRendererVisitor renderer(format,
+                                                  doc->getDimenstions());
+
+  renderer.beginMode();
+
+  doc->getRoot()->accept(renderer);
+
+  renderer.endAndSaveToFile(doc->getFilePath());
 }
 
 void ui::Editor::toggleGrid() {
