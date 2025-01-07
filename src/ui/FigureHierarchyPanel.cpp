@@ -1,5 +1,7 @@
 #include "FigureHierarchyPanel.h"
 
+#include <ranges>
+
 #include "../figure/CircleFigure.h"
 #include "../figure/RectFigure.h"
 #include "Editor.h"
@@ -28,10 +30,14 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
         figureToSelect(figureToSelect) {}
 
   void visit(std::shared_ptr<FigureGroup> group) override {
-    simpleFigVisit(group, "Group");
+    if (group->getParent()) {
+      simpleFigVisit(group, "Group");
+    } else {
+      simpleFigVisit(group, "Root");
+    }
     indentLevel++;
     offset.x += IndentWidth;
-    for (auto c : group->getChildren()) {
+    for (auto c : std::ranges::reverse_view(group->getChildren())) {
       c->accept(*this);
     }
     offset.x -= IndentWidth;

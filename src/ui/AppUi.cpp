@@ -32,6 +32,8 @@ ui::AppUi::AppUi()
 
   auto groupButton = std::make_shared<IconButton>(ICON_LINK);
   auto ungroupButton = std::make_shared<IconButton>(ICON_LINK_BROKE);
+  auto moveHigherButton = std::make_shared<IconButton>(ICON_STEP_OUT);
+  auto moveLowerButton = std::make_shared<IconButton>(ICON_STEP_INTO);
 
   {
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
@@ -103,6 +105,20 @@ ui::AppUi::AppUi()
     groupButton->setStrategy(groupStrat);
   }
 
+  {
+    auto moveLowerStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->changeFigureOrder(-1); });
+
+    moveLowerButton->setStrategy(moveLowerStrat);
+  }
+
+  {
+    auto moveHigherStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->changeFigureOrder(+1); });
+
+    moveHigherButton->setStrategy(moveHigherStrat);
+  }
+
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
   toolbar->addWidget(nullptr);
@@ -116,6 +132,8 @@ ui::AppUi::AppUi()
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(groupButton));
   toolbar->addWidget(std::move(ungroupButton));
+  toolbar->addWidget(std::move(moveLowerButton));
+  toolbar->addWidget(std::move(moveHigherButton));
 }
 
 void ui::AppUi::update() {

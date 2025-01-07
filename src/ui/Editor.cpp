@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "../commands/AddFigureCommand.h"
+#include "../commands/ChangeOrderCommand.h"
 #include "../commands/GroupFiguresCommand.h"
 #include "../commands/MovePointCommand.h"
 #include "../figure/Figure.h"
@@ -78,8 +79,8 @@ void ui::Editor::update() {
   EndMode2D();
 
   {
-    Rectangle r = {rect.x, rect.y + rect.height - 20,
-                   rect.width - PropsPanelWidth, 20};
+    Rectangle r = {rect.x + HierarchyPanelWidth, rect.y + rect.height - 20,
+                   rect.width - PropsPanelWidth - HierarchyPanelWidth, 20};
 
     std::string modeString;
     switch (mode) {
@@ -315,6 +316,16 @@ void ui::Editor::groupFigures() {
   doc->getCommandManager().addAndExecCommand(std::move(groupCmd));
 
   selectFigure(std::move(transientGroup));
+}
+
+void ui::Editor::changeFigureOrder(int delta) {
+  if (!selectedFigure || !doc || transientGroup)
+    return;
+
+  auto changeOrderCmd =
+      std::make_shared<command::ChangeOrderCommand>(selectedFigure, delta);
+
+  doc->getCommandManager().addAndExecCommand(std::move(changeOrderCmd));
 }
 
 void ui::Editor::saveDocument() {
