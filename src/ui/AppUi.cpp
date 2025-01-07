@@ -6,6 +6,7 @@
 #include "../figure/CircleFigure.h"
 #include "../figure/PolyFigure.h"
 #include "../figure/RectFigure.h"
+#include "../util.h"
 #include "DocumentTabs.h"
 #include "IconButton.h"
 #include "strategy/FunctorStrategy.h"
@@ -46,6 +47,7 @@ ui::AppUi::AppUi()
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
 
     newDocButton->setStrategy(newDocStrat);
+    addShortcut(newDocStrat, KEY_N, keyboardShortcutMod());
   }
 
   {
@@ -53,18 +55,21 @@ ui::AppUi::AppUi()
         std::make_shared<strategy::SaveDocumentStrategy>(editor);
 
     saveDocButton->setStrategy(saveDocStrat);
+    addShortcut(saveDocStrat, KEY_S, keyboardShortcutMod());
   }
 
   {
     auto undoStrat = std::make_shared<strategy::UndoStrategy>(editor);
 
     undoButton->setStrategy(undoStrat);
+    addShortcut(undoStrat, KEY_Z, keyboardShortcutMod());
   }
 
   {
     auto redoStrat = std::make_shared<strategy::RedoStrategy>(editor);
 
     redoButton->setStrategy(redoStrat);
+    addShortcut(redoStrat, KEY_Y, keyboardShortcutMod());
   }
 
   {
@@ -77,6 +82,7 @@ ui::AppUi::AppUi()
     auto selectStrat = std::make_shared<strategy::SetSelectStrategy>(editor);
 
     selectButton->setStrategy(selectStrat);
+    addShortcut(selectStrat, KEY_Q);
   }
 
   {
@@ -89,7 +95,7 @@ ui::AppUi::AppUi()
     auto setRectStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
         editor, rect, ICON_PLAYER_STOP);
 
-    insertRectButton->setStrategy(setRectStrat);
+    addShortcut(setRectStrat, KEY_R);
   }
 
   {
@@ -103,6 +109,8 @@ ui::AppUi::AppUi()
         editor, circle, ICON_PLAYER_RECORD);
 
     insertCircleButton->setStrategy(setCircleStrat);
+
+    addShortcut(setCircleStrat, KEY_E);
   }
 
   {
@@ -116,6 +124,8 @@ ui::AppUi::AppUi()
         editor, poly, ICON_STAR);
 
     insertPolyButton->setStrategy(setPolyStrat);
+
+    addShortcut(setPolyStrat, KEY_Y);
   }
 
   {
@@ -128,6 +138,7 @@ ui::AppUi::AppUi()
         editor, line, ICON_CROSSLINE);
 
     insertLineButton->setStrategy(setLineStrat);
+    addShortcut(setLineStrat, KEY_L);
   }
 
   {
@@ -135,6 +146,7 @@ ui::AppUi::AppUi()
         [this]() { editor->groupFigures(); });
 
     groupButton->setStrategy(groupStrat);
+    addShortcut(groupStrat, KEY_G, keyboardShortcutMod());
   }
 
   {
@@ -142,6 +154,7 @@ ui::AppUi::AppUi()
         [this]() { editor->ungroupFigures(); });
 
     ungroupButton->setStrategy(ungroupStrat);
+    addShortcut(ungroupStrat, KEY_U, keyboardShortcutMod());
   }
 
   {
@@ -149,6 +162,7 @@ ui::AppUi::AppUi()
         [this]() { editor->changeFigureOrder(-1); });
 
     moveLowerButton->setStrategy(moveLowerStrat);
+    addShortcut(moveLowerStrat, KEY_PAGE_DOWN);
   }
 
   {
@@ -156,6 +170,7 @@ ui::AppUi::AppUi()
         [this]() { editor->changeFigureOrder(+1); });
 
     moveHigherButton->setStrategy(moveHigherStrat);
+    addShortcut(moveHigherStrat, KEY_PAGE_UP);
   }
 
   {
@@ -163,13 +178,15 @@ ui::AppUi::AppUi()
         [this]() { editor->removeFigure(); });
 
     removeFigureButton->setStrategy(removeStrat);
+    addShortcut(removeStrat, KEY_DELETE);
   }
 
   {
-    auto removeStrat = std::make_shared<strategy::FunctorStrategy<>>(
+    auto dupStrat = std::make_shared<strategy::FunctorStrategy<>>(
         [this]() { editor->duplicateFigure(); });
 
-    dupFigureButton->setStrategy(removeStrat);
+    dupFigureButton->setStrategy(dupStrat);
+    addShortcut(dupStrat, KEY_D, keyboardShortcutMod());
   }
 
   {
@@ -177,6 +194,7 @@ ui::AppUi::AppUi()
         [this]() { editor->toggleGrid(); });
 
     gridButton->setStrategy(gridStrat);
+    addShortcut(gridStrat, KEY_I, keyboardShortcutMod());
   }
 
   toolbar->addWidget(std::move(newDocButton));
@@ -206,6 +224,10 @@ void ui::AppUi::update() {
   tabBar->update();
   toolbar->update();
   editor->update();
+
+  for (auto& ks : shortcuts) {
+    ks.update();
+  }
 }
 
 void ui::AppUi::setRect(const Rectangle& rect) {
@@ -214,4 +236,12 @@ void ui::AppUi::setRect(const Rectangle& rect) {
   toolbar->setRect({rect.x, rect.y + 24, rect.width, 32});
   editor->setRect(
       {rect.x, rect.y + 24 + 32, rect.width, rect.height - 24 - 32});
+}
+
+void ui::AppUi::addShortcut(std::shared_ptr<strategy::Strategy<>> strat,
+                            int key,
+                            int mod) {
+  KeyboardShortcut ks(key, mod);
+  ks.setStrategy(strat);
+  shortcuts.push_back(ks);
 }
