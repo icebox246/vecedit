@@ -41,6 +41,7 @@ set(SOURCE
     
     src/figure/RectFigure.cpp
     src/figure/CircleFigure.cpp
+    src/figure/FigureGroup.cpp
     
     src/figure/visitor/RendererVisitor.cpp
     src/figure/visitor/PointIntersectionVisitor.cpp
@@ -48,6 +49,7 @@ set(SOURCE
     
     src/figure/adapter/RectFigurePointEditor.cpp
     src/figure/adapter/CircleFigurePointEditor.cpp
+    src/figure/adapter/FigureGroupPointEditor.cpp
 
     src/commands/CommandManager.cpp
 )

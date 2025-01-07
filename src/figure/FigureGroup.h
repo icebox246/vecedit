@@ -1,26 +1,46 @@
 #pragma once
 
-#include "FigureBase.h"
+#include <cassert>
+#include <memory>
+
+#include "Figure.h"
 
 namespace figure {
 
-class FigureGroup : public FigureBase<FigureGroup> {
+class FigureGroup : public Figure,
+                    public std::enable_shared_from_this<FigureGroup> {
   std::vector<std::shared_ptr<Figure>> children;
 
  public:
   ~FigureGroup() override = default;
 
-  void addChild(std::shared_ptr<Figure> figure) {
-    children.emplace_back(std::move(figure));
-  }
-  void removeChild(std::shared_ptr<Figure> figure) {
-    children.erase(std::ranges::find(children, figure));
-  }
-  const std::vector<std::shared_ptr<Figure>>& getChildren() { return children; }
+  std::shared_ptr<Figure> clone() override;
 
-  std::shared_ptr<PointEditor> makePointEditor() override {
-    assert(false && "TODO: unimplemented");
-  }
+  Vector2 getOrigin() override;
+
+  void setOrigin(Vector2 origin) override;
+
+  void accept(visitor::FigureVisitor& vis) override;
+
+  Color getFill() override;
+
+  void setFill(Color c) override;
+
+  Color getStroke() override;
+
+  void setStroke(Color c) override;
+
+  float getStrokeWeight() override;
+
+  void setStrokeWeight(float w) override;
+
+  void addChild(std::shared_ptr<Figure> figure);
+
+  void removeChild(std::shared_ptr<Figure> figure);
+
+  const std::vector<std::shared_ptr<Figure>>& getChildren();
+
+  std::shared_ptr<PointEditor> makePointEditor() override;
 };
 
 }  // namespace figure

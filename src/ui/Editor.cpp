@@ -215,7 +215,17 @@ void ui::Editor::processModeSelect() {
     doc->getRoot()->accept(intersectionVisitor);
 
     if (intersectionVisitor.intersects()) {
-      selectFigure(intersectionVisitor.getIntersectingFigure());
+      if (IsKeyDown(KEY_LEFT_SHIFT) && selectedFigure) {
+        if (!transientGroup) {
+          transientGroup = std::make_shared<figure::FigureGroup>();
+          transientGroup->addChild(selectedFigure);
+          selectFigure(transientGroup);
+        }
+
+        transientGroup->addChild(intersectionVisitor.getIntersectingFigure());
+      } else {
+        selectFigure(intersectionVisitor.getIntersectingFigure());
+      }
     } else {
       selectFigure(nullptr);
     }
@@ -244,6 +254,9 @@ void ui::Editor::processModeInsert() {
 }
 
 void ui::Editor::selectFigure(std::shared_ptr<figure::Figure> figure) {
+  if (figure != transientGroup) {
+    transientGroup.reset();
+  }
   propsPanel->setFigure(figure);
   selectedFigure = std::move(figure);
   draggedPointId = {};

@@ -21,6 +21,7 @@ class Editor : Widget {
   std::shared_ptr<figure::Figure> figurePrototype;
 
   std::shared_ptr<figure::Figure> selectedFigure = {};
+  std::shared_ptr<figure::FigureGroup> transientGroup = {};
   std::optional<std::size_t> draggedPointId = {};
   Vector2 mouseDragStartPos;
 
