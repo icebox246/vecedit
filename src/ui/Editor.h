@@ -5,12 +5,13 @@
 #include <optional>
 
 #include "../Document.h"
+#include "FigureHierarchyPanel.h"
 #include "FigurePropertiesPanel.h"
 #include "Widget.h"
 
 namespace ui {
 
-class Editor : Widget {
+class Editor : public Widget, public std::enable_shared_from_this<Editor> {
  public:
   enum class Mode { Select, Insert };
 
@@ -26,6 +27,7 @@ class Editor : Widget {
   Vector2 mouseDragStartPos;
 
   std::shared_ptr<FigurePropertiesPanel> propsPanel;
+  std::shared_ptr<FigureHierarchyPanel> hierarchyPanel;
 
   GuiIconName cursorIcon = ICON_NONE;
 
@@ -46,12 +48,13 @@ class Editor : Widget {
 
   void saveDocument();
 
+  void selectFigure(std::shared_ptr<figure::Figure> figure, bool multi = false);
+
  private:
   bool isFocused();
   Vector2 getCursorPos();
   void processModeSelect();
   void processModeInsert();
-  void selectFigure(std::shared_ptr<figure::Figure> figure);
 };
 
 }  // namespace ui

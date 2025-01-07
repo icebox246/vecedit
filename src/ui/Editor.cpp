@@ -14,9 +14,12 @@
 
 namespace {
 constexpr auto PropsPanelWidth = 300;
-}
+constexpr auto HierarchyPanelWidth = 200;
+}  // namespace
 
-ui::Editor::Editor() : propsPanel(std::make_shared<FigurePropertiesPanel>()) {
+ui::Editor::Editor()
+    : propsPanel(std::make_shared<FigurePropertiesPanel>()),
+      hierarchyPanel(std::make_shared<FigureHierarchyPanel>()) {
   resetCamera();
 }
 
@@ -41,7 +44,9 @@ void ui::Editor::update() {
     }
   }
 
-  BeginScissorMode(rect.x, rect.y, rect.width - PropsPanelWidth, rect.height);
+  BeginScissorMode(rect.x + HierarchyPanelWidth, rect.y,
+                   rect.width - PropsPanelWidth - HierarchyPanelWidth,
+                   rect.height);
   ClearBackground(GRAY);
   if (isFocused()) {
     DrawRectangleLines(rect.x + 1, rect.y + 1, rect.width - 1 - PropsPanelWidth,
@@ -98,19 +103,25 @@ void ui::Editor::update() {
   EndScissorMode();
 
   propsPanel->update();
+  hierarchyPanel->update();
 }
 
 void ui::Editor::setRect(const Rectangle& rect) {
   Widget::setRect(rect);
 
-  camera.offset = Vector2{rect.x, rect.y} +
-                  Vector2{rect.width - PropsPanelWidth, rect.height} * 0.5f;
+  camera.offset =
+      Vector2{rect.x, rect.y} +
+      Vector2{rect.width - PropsPanelWidth + HierarchyPanelWidth, rect.height} *
+          0.5f;
 
   propsPanel->setRect({rect.x + rect.width - PropsPanelWidth, rect.y,
                        PropsPanelWidth, rect.height});
+
+  hierarchyPanel->setRect({rect.x, rect.y, HierarchyPanelWidth, rect.height});
 }
 
 void ui::Editor::setDocument(std::shared_ptr<Document> newDoc) {
+  hierarchyPanel->setEditor(shared_from_this());
   auto oldDoc = std::exchange(this->doc, newDoc);
 
   selectFigure(nullptr);
@@ -119,6 +130,7 @@ void ui::Editor::setDocument(std::shared_ptr<Document> newDoc) {
     resetCamera();
 
   propsPanel->setDocument(doc);
+  hierarchyPanel->setDocument(doc);
 }
 
 void ui::Editor::resetCamera() {
@@ -141,8 +153,9 @@ void ui::Editor::setCursorIcon(GuiIconName icon) {
 }
 
 bool ui::Editor::isFocused() {
-  auto realRect =
-      Rectangle{rect.x, rect.y, rect.width - PropsPanelWidth, rect.height};
+  auto realRect = Rectangle{rect.x + HierarchyPanelWidth, rect.y,
+                            rect.width - PropsPanelWidth - HierarchyPanelWidth,
+                            rect.height};
   return CheckCollisionPointRec(GetMousePosition(), realRect);
 }
 
@@ -215,17 +228,8 @@ void ui::Editor::processModeSelect() {
     doc->getRoot()->accept(intersectionVisitor);
 
     if (intersectionVisitor.intersects()) {
-      if (IsKeyDown(KEY_LEFT_SHIFT) && selectedFigure) {
-        if (!transientGroup) {
-          transientGroup = std::make_shared<figure::FigureGroup>();
-          transientGroup->addChild(selectedFigure);
-          selectFigure(transientGroup);
-        }
-
-        transientGroup->addChild(intersectionVisitor.getIntersectingFigure());
-      } else {
-        selectFigure(intersectionVisitor.getIntersectingFigure());
-      }
+      selectFigure(intersectionVisitor.getIntersectingFigure(),
+                   IsKeyDown(KEY_LEFT_SHIFT));
     } else {
       selectFigure(nullptr);
     }
@@ -253,11 +257,34 @@ void ui::Editor::processModeInsert() {
   }
 }
 
-void ui::Editor::selectFigure(std::shared_ptr<figure::Figure> figure) {
+void ui::Editor::selectFigure(std::shared_ptr<figure::Figure> figure,
+                              bool multi) {
+  if (multi && selectedFigure) {
+    if (!transientGroup) {
+      auto oldFig = selectedFigure;
+
+      transientGroup = std::make_shared<figure::FigureGroup>();
+      transientGroup->addChild(selectedFigure);
+      selectFigure(transientGroup);
+      hierarchyPanel->markFigure(oldFig);
+    }
+
+    transientGroup->addChild(figure);
+    hierarchyPanel->markFigure(figure);
+
+    return;
+  }
+
   if (figure != transientGroup) {
     transientGroup.reset();
   }
   propsPanel->setFigure(figure);
+
+  hierarchyPanel->unmarkFigures();
+  if (figure) {
+    hierarchyPanel->markFigure(figure);
+  }
+
   selectedFigure = std::move(figure);
   draggedPointId = {};
 }
