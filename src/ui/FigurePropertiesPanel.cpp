@@ -19,9 +19,9 @@ void ui::FigurePropertiesPanel::update() {
             *editedFig);
   }
 
-  {
-    float yOffset = rect.y + 30;
+  float yOffset = rect.y + 30;
 
+  {
     Color c;
 
     switch (colorEditMode) {
@@ -39,6 +39,12 @@ void ui::FigurePropertiesPanel::update() {
         Rectangle{rect.x + 10, yOffset + 20, rect.width - 40, rect.width - 20};
     GuiColorPicker(colorPickRect, "Color", &c);
 
+    yOffset += rect.width + 10;
+    float alphaF = c.a / 255.f;
+    GuiColorBarAlpha(Rectangle{rect.x + 10, yOffset, (rect.width - 40), 20},
+                     "Alpha", &alphaF);
+    c.a = alphaF * 255;
+
     if (!ColorIsEqual(c, oldC)) {
       switch (colorEditMode) {
         case ColorMode::Fill:
@@ -53,9 +59,8 @@ void ui::FigurePropertiesPanel::update() {
     }
   }
 
+  yOffset += 30;
   {
-    float yOffset = rect.y + rect.width + 40;
-
     int selection = (int)colorEditMode;
     GuiToggleGroup(Rectangle{rect.x + 10, yOffset, (rect.width - 40) / 2, 20},
                    "Fill;Stroke", (int*)&selection);
@@ -63,9 +68,8 @@ void ui::FigurePropertiesPanel::update() {
     colorEditMode = (ColorMode)(selection);
   }
 
+  yOffset += 30;
   {
-    float yOffset = rect.y + rect.width + 70;
-
     float f = editedFig->getStrokeWeight();
     auto oldF = f;
 
