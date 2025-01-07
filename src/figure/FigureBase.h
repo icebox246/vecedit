@@ -16,6 +16,8 @@ class FigureBase : public Figure,
   Color fill, stroke;
   float strokeWeight;
 
+  std::weak_ptr<FigureGroup> transientParent;
+
  public:
   ~FigureBase() override = default;
 
@@ -39,6 +41,13 @@ class FigureBase : public Figure,
 
   float getStrokeWeight() override { return strokeWeight; }
   void setStrokeWeight(float w) override { strokeWeight = w; }
+
+  void updateParent(std::shared_ptr<FigureGroup> parent = nullptr) override {
+    transientParent = parent;
+  }
+  std::shared_ptr<FigureGroup> getParent() override {
+    return transientParent.lock();
+  }
 };
 
 }  // namespace figure

@@ -7,6 +7,7 @@
 
 #include "../commands/AddFigureCommand.h"
 #include "../commands/MovePointCommand.h"
+#include "../figure/Figure.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
 #include "../figure/visitor/SvgSerializerVisitor.h"
@@ -33,6 +34,8 @@ void ui::Editor::update() {
     GuiLabel(r, GuiIconText(ICON_FILE_ADD, "Create new document"));
     return;
   }
+
+  doc->getRoot()->updateParent();
 
   if (isFocused()) {
     if (IsKeyDown(KEY_LEFT_CONTROL)) {

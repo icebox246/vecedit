@@ -29,6 +29,9 @@ class Figure {
 
   virtual float getStrokeWeight() = 0;
   virtual void setStrokeWeight(float w) = 0;
+
+  virtual void updateParent(std::shared_ptr<class FigureGroup> parent = nullptr) = 0;
+  virtual std::shared_ptr<class FigureGroup> getParent() = 0;
 };
 
 }  // namespace figure

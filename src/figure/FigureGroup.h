@@ -10,6 +10,7 @@ namespace figure {
 class FigureGroup : public Figure,
                     public std::enable_shared_from_this<FigureGroup> {
   std::vector<std::shared_ptr<Figure>> children;
+  std::weak_ptr<FigureGroup> transientParent;
 
  public:
   ~FigureGroup() override = default;
@@ -41,6 +42,18 @@ class FigureGroup : public Figure,
   const std::vector<std::shared_ptr<Figure>>& getChildren();
 
   std::shared_ptr<PointEditor> makePointEditor() override;
+
+  void updateParent(std::shared_ptr<FigureGroup> parent = nullptr) override {
+    transientParent = parent;
+
+    auto self = shared_from_this();
+    for (auto& c : children) {
+      c->updateParent(self);
+    }
+  }
+  std::shared_ptr<FigureGroup> getParent() override {
+    return transientParent.lock();
+  }
 };
 
 }  // namespace figure
