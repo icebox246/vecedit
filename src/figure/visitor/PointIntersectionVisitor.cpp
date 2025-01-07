@@ -22,7 +22,13 @@ figure::visitor::PointIntersectionVisitor::getIntersectingFigure() {
 
 void figure::visitor::PointIntersectionVisitor::visit(
     std::shared_ptr<FigureGroup> group) {
+  if (!group->getVisible())
+    return;
+
   for (auto fig : std::ranges::reverse_view(group->getChildren())) {
+    if (!fig->getVisible())
+      continue;
+
     fig->accept(*this);
 
     if (intersects())

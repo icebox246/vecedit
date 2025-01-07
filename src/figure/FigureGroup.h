@@ -11,6 +11,7 @@ class FigureGroup : public Figure,
                     public std::enable_shared_from_this<FigureGroup> {
   std::vector<std::shared_ptr<Figure>> children;
   std::weak_ptr<FigureGroup> transientParent;
+  bool visible{true};
 
  public:
   ~FigureGroup() override = default;
@@ -58,6 +59,9 @@ class FigureGroup : public Figure,
   std::shared_ptr<FigureGroup> getParent() override {
     return transientParent.lock();
   }
+
+  void setVisible(bool newVisible) override { visible = newVisible; }
+  bool getVisible() override { return visible; }
 };
 
 }  // namespace figure

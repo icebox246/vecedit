@@ -2,6 +2,7 @@
 
 #include <ranges>
 
+#include "../commands/ToggleVisibilityCommand.h"
 #include "../figure/CircleFigure.h"
 #include "../figure/PolyFigure.h"
 #include "../figure/RectFigure.h"
@@ -18,6 +19,7 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
   Rectangle rect;
   const std::unordered_set<std::shared_ptr<figure::Figure>>& markedFigures;
   std::shared_ptr<figure::Figure>& figureToSelect;
+  std::shared_ptr<figure::Figure>& figureToToggleVisibility;
   Vector2 offset{0, 0};
   int indentLevel = 0;
 
@@ -25,10 +27,12 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
   HierarchyTreeRendererVisitor(
       Rectangle rect,
       const std::unordered_set<std::shared_ptr<figure::Figure>>& markedFigures,
-      std::shared_ptr<figure::Figure>& figureToSelect)
+      std::shared_ptr<figure::Figure>& figureToSelect,
+      std::shared_ptr<figure::Figure>& figureToToggleVisibility)
       : rect(rect),
         markedFigures(markedFigures),
-        figureToSelect(figureToSelect) {}
+        figureToSelect(figureToSelect),
+        figureToToggleVisibility(figureToToggleVisibility) {}
 
   void visit(std::shared_ptr<FigureGroup> group) override {
     if (group->getParent()) {
@@ -69,11 +73,18 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
 
  private:
   void simpleFigVisit(std::shared_ptr<Figure> fig, std::string name) {
-    Rectangle r = {rect.x + offset.x, rect.y + offset.y, rect.width - offset.x,
-                   ItemHeight};
+    Rectangle r = {rect.x + offset.x, rect.y + offset.y,
+                   rect.width - offset.x - ItemHeight, ItemHeight};
     if (GuiLabelButton(r, name.c_str())) {
       figureToSelect = fig;
     }
+    if (GuiLabelButton(
+            Rectangle{rect.x + rect.width - ItemHeight, rect.y + offset.y,
+                      ItemHeight, ItemHeight},
+            GuiIconText(fig->getVisible() ? ICON_EYE_ON : ICON_EYE_OFF, ""))) {
+      figureToToggleVisibility = fig;
+    }
+
     if (markedFigures.contains(fig)) {
       DrawRectangleLinesEx(r, 1, SKYBLUE);
     }
@@ -100,7 +111,10 @@ void ui::FigureHierarchyPanel::update() {
   innerRect.height -= 32;
   innerRect.x += 4;
   innerRect.width -= 8;
-  HierarchyTreeRendererVisitor vis(innerRect, markedFigures, figureToSelect);
+  std::shared_ptr<Figure> figureToSelect = nullptr;
+  std::shared_ptr<Figure> figureToToggleVisibility = nullptr;
+  HierarchyTreeRendererVisitor vis(innerRect, markedFigures, figureToSelect,
+                                   figureToToggleVisibility);
 
   figureToSelect = nullptr;
 
@@ -112,6 +126,11 @@ void ui::FigureHierarchyPanel::update() {
     ownEditor->selectFigure(figureToSelect, IsKeyDown(KEY_LEFT_SHIFT));
     ownEditor->setMode(Editor::Mode::Select);
   }
+
+  if (figureToToggleVisibility)
+    doc->getCommandManager().addAndExecCommand(
+        std::make_shared<command::ToggleVisibilityCommand>(
+            figureToToggleVisibility));
 }
 
 void ui::FigureHierarchyPanel::setDocument(std::shared_ptr<Document> newDoc) {

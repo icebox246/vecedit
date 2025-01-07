@@ -15,6 +15,7 @@ class FigureBase : public Figure,
   Vector2 origin;
   Color fill, stroke;
   float strokeWeight;
+  bool visible{true};
 
   std::weak_ptr<FigureGroup> transientParent;
 
@@ -48,6 +49,9 @@ class FigureBase : public Figure,
   std::shared_ptr<FigureGroup> getParent() override {
     return transientParent.lock();
   }
+
+  void setVisible(bool newVisible) override { visible = newVisible; }
+  bool getVisible() override { return visible; }
 };
 
 }  // namespace figure

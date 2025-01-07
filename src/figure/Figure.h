@@ -32,6 +32,9 @@ class Figure {
 
   virtual void updateParent(std::shared_ptr<class FigureGroup> parent = nullptr) = 0;
   virtual std::shared_ptr<class FigureGroup> getParent() = 0;
+
+  virtual void setVisible(bool newVisible) = 0;
+  virtual bool getVisible() = 0;
 };
 
 }  // namespace figure

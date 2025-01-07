@@ -14,8 +14,6 @@ class FigureHierarchyPanel : public Widget {
   std::unordered_set<std::shared_ptr<figure::Figure>> markedFigures = {};
   std::weak_ptr<class Editor> editor;
 
-  std::shared_ptr<figure::Figure> figureToSelect;
-
  public:
   ~FigureHierarchyPanel() override = default;
 

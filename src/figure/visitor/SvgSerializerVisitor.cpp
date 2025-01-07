@@ -52,7 +52,13 @@ void figure::visitor::SvgSerializerVisitor::saveToFile(
 
 void figure::visitor::SvgSerializerVisitor::visit(
     std::shared_ptr<FigureGroup> group) {
+  if (!group->getVisible())
+    return;
+
   for (auto fig : group->getChildren()) {
+    if (!fig->getVisible())
+      continue;
+
     fig->accept(*this);
   }
 }
