@@ -248,7 +248,9 @@ void ui::Editor::processModeInsert() {
     auto cursor = getCursorPos();
     newFigure->setOrigin(cursor);
 
-    auto addCmd = std::make_shared<command::AddFigureCommand>(doc, newFigure);
+    // TODO: support other parents than root of document
+    auto addCmd =
+        std::make_shared<command::AddFigureCommand>(doc->getRoot(), newFigure);
     addCmd->execute();
     doc->getCommandManager().addCommand(addCmd);
 

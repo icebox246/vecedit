@@ -2,25 +2,25 @@
 
 #include <memory>
 
-#include "../Document.h"
 #include "../figure/Figure.h"
+#include "../figure/FigureGroup.h"
 #include "Command.h"
 
 namespace command {
 
 class AddFigureCommand : public Command {
-  std::shared_ptr<Document> doc;
+  std::shared_ptr<figure::FigureGroup> parent;
   std::shared_ptr<figure::Figure> fig;
 
  public:
-  AddFigureCommand(std::shared_ptr<Document> doc,
+  AddFigureCommand(std::shared_ptr<figure::FigureGroup> parent,
                    std::shared_ptr<figure::Figure> fig)
-      : doc(std::move(doc)), fig(std::move(fig)) {}
+      : parent(std::move(parent)), fig(std::move(fig)) {}
   ~AddFigureCommand() override = default;
 
-  void execute() override { doc->getRoot()->addChild(fig); }
+  void execute() override { parent->addChild(fig); }
 
-  void unexecute() override { doc->getRoot()->removeChild(fig); }
+  void unexecute() override { parent->removeChild(fig); }
 };
 
 }  // namespace command
