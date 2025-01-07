@@ -4,6 +4,7 @@
 #include <fstream>
 #include "../CircleFigure.h"
 #include "../FigureGroup.h"
+#include "../PolyFigure.h"
 #include "../RectFigure.h"
 
 static std::string colorToHex(Color color) {
@@ -72,4 +73,16 @@ void figure::visitor::SvgSerializerVisitor::visit(
           cx="{}" cy="{}" r="{}" />)",
                     makeStyleStringForFigure(*circle), c.x, c.y,
                     circle->getRadius());
+}
+
+void figure::visitor::SvgSerializerVisitor::visit(
+    std::shared_ptr<PolyFigure> poly) {
+  auto origin = poly->getOrigin();
+  ss << std::format(R"(<path style="{}" d="M {} {})",
+                    makeStyleStringForFigure(*poly), origin.x, origin.y);
+  for (auto offset : poly->getOffsets()) {
+    auto point = origin + offset;
+    ss << std::format(" L {} {}", point.x, point.y);
+  }
+  ss << std::format(R"( L {} {}" />)", origin.x, origin.y);
 }

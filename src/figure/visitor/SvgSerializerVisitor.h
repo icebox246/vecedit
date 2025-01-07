@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <cassert>
 #include <filesystem>
 #include <sstream>
 
@@ -20,6 +21,7 @@ class SvgSerializerVisitor : public FigureVisitor {
   void visit(std::shared_ptr<FigureGroup> group) override;
   void visit(std::shared_ptr<RectFigure> rect) override;
   void visit(std::shared_ptr<CircleFigure> circle) override;
+  void visit(std::shared_ptr<PolyFigure> poly) override;
 };
 
 }  // namespace figure::visitor

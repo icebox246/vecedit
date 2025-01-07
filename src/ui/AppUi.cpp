@@ -4,6 +4,7 @@
 #include <raylib.h>
 
 #include "../figure/CircleFigure.h"
+#include "../figure/PolyFigure.h"
 #include "../figure/RectFigure.h"
 #include "DocumentTabs.h"
 #include "IconButton.h"
@@ -29,6 +30,8 @@ ui::AppUi::AppUi()
 
   auto insertRectButton = std::make_shared<IconButton>(ICON_PLAYER_STOP);
   auto insertCircleButton = std::make_shared<IconButton>(ICON_PLAYER_RECORD);
+  auto insertPolyButton = std::make_shared<IconButton>(ICON_STAR);
+  auto insertLineButton = std::make_shared<IconButton>(ICON_CROSSLINE);
 
   auto groupButton = std::make_shared<IconButton>(ICON_LINK);
   auto ungroupButton = std::make_shared<IconButton>(ICON_LINK_BROKE);
@@ -99,6 +102,31 @@ ui::AppUi::AppUi()
   }
 
   {
+    auto poly = std::make_shared<figure::PolyFigure>(5);
+    poly->initializeRegularPolygon(20);
+    poly->setFill(PINK);
+    poly->setStroke(BLACK);
+    poly->setStrokeWeight(1);
+
+    auto setPolyStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
+        editor, poly, ICON_STAR);
+
+    insertPolyButton->setStrategy(setPolyStrat);
+  }
+
+  {
+    auto line = std::make_shared<figure::PolyFigure>(2);
+    line->setOffset(0, {30, 30});
+    line->setStroke(BLACK);
+    line->setStrokeWeight(3);
+
+    auto setLineStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
+        editor, line, ICON_CROSSLINE);
+
+    insertLineButton->setStrategy(setLineStrat);
+  }
+
+  {
     auto groupStrat = std::make_shared<strategy::FunctorStrategy<>>(
         [this]() { editor->groupFigures(); });
 
@@ -136,6 +164,8 @@ ui::AppUi::AppUi()
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(insertRectButton));
   toolbar->addWidget(std::move(insertCircleButton));
+  toolbar->addWidget(std::move(insertPolyButton));
+  toolbar->addWidget(std::move(insertLineButton));
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(groupButton));
   toolbar->addWidget(std::move(ungroupButton));

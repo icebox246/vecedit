@@ -50,6 +50,7 @@ set(SOURCE
     
     src/figure/adapter/RectFigurePointEditor.cpp
     src/figure/adapter/CircleFigurePointEditor.cpp
+    src/figure/adapter/PolyFigurePointEditor.cpp
     src/figure/adapter/FigureGroupPointEditor.cpp
 
     src/commands/CommandManager.cpp

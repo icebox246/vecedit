@@ -3,6 +3,7 @@
 #include <ranges>
 
 #include "../figure/CircleFigure.h"
+#include "../figure/PolyFigure.h"
 #include "../figure/RectFigure.h"
 #include "Editor.h"
 
@@ -50,6 +51,20 @@ class HierarchyTreeRendererVisitor : public visitor::FigureVisitor {
 
   void visit(std::shared_ptr<CircleFigure> circle) override {
     simpleFigVisit(circle, "Circle");
+  }
+
+  void visit(std::shared_ptr<PolyFigure> poly) override {
+    switch (poly->getPointCount()) {
+      case 2:
+        simpleFigVisit(poly, "Line");
+        break;
+      case 3:
+        simpleFigVisit(poly, "Triangle");
+        break;
+      default:
+        simpleFigVisit(poly, "Polygon");
+        break;
+    }
   }
 
  private:
