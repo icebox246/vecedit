@@ -24,7 +24,7 @@ ui::AppUi::AppUi()
       editor(std::make_shared<Editor>()) {
   auto newDocButton = std::make_shared<IconButton>(ICON_FILE_ADD);
   auto saveDocButton = std::make_shared<IconButton>(ICON_FILE_SAVE_CLASSIC);
-  auto exportDocButton = std::make_shared<IconButton>(ICON_FILETYPE_IMAGE);
+  auto exportDocButton = std::make_shared<IconButton>(ICON_FILE_EXPORT);
 
   auto undoButton = std::make_shared<IconButton>(ICON_UNDO);
   auto redoButton = std::make_shared<IconButton>(ICON_REDO);
