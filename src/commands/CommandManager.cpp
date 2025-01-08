@@ -7,6 +7,13 @@ void command::CommandManager::addCommand(std::shared_ptr<Command> newCmd) {
     undoneCommands.pop();
 }
 
+void command::CommandManager::addAndExecCommand(
+    std::shared_ptr<Command> newCmd) {
+  addCommand(newCmd);
+
+  newCmd->execute();
+}
+
 void command::CommandManager::undo() {
   if (doneCommands.empty())
     return;

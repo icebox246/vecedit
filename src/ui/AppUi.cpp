@@ -4,9 +4,12 @@
 #include <raylib.h>
 
 #include "../figure/CircleFigure.h"
+#include "../figure/PolyFigure.h"
 #include "../figure/RectFigure.h"
+#include "../util.h"
 #include "DocumentTabs.h"
 #include "IconButton.h"
+#include "strategy/FunctorStrategy.h"
 #include "strategy/NewDocumentStrategy.h"
 #include "strategy/OpenDocumentStrategy.h"
 #include "strategy/RedoStrategy.h"
@@ -21,6 +24,8 @@ ui::AppUi::AppUi()
       editor(std::make_shared<Editor>()) {
   auto newDocButton = std::make_shared<IconButton>(ICON_FILE_ADD);
   auto saveDocButton = std::make_shared<IconButton>(ICON_FILE_SAVE_CLASSIC);
+  auto exportDocButton = std::make_shared<IconButton>(ICON_FILE_EXPORT);
+
   auto undoButton = std::make_shared<IconButton>(ICON_UNDO);
   auto redoButton = std::make_shared<IconButton>(ICON_REDO);
 
@@ -28,11 +33,25 @@ ui::AppUi::AppUi()
 
   auto insertRectButton = std::make_shared<IconButton>(ICON_PLAYER_STOP);
   auto insertCircleButton = std::make_shared<IconButton>(ICON_PLAYER_RECORD);
+  auto insertPolyButton = std::make_shared<IconButton>(ICON_STAR);
+  auto insertLineButton = std::make_shared<IconButton>(ICON_CROSSLINE);
+
+  auto groupButton = std::make_shared<IconButton>(ICON_LINK);
+  auto ungroupButton = std::make_shared<IconButton>(ICON_LINK_BROKE);
+  auto moveHigherButton = std::make_shared<IconButton>(ICON_STEP_OUT);
+  auto moveLowerButton = std::make_shared<IconButton>(ICON_STEP_INTO);
+  auto removeFigureButton = std::make_shared<IconButton>(ICON_FILE_DELETE);
+  auto dupFigureButton = std::make_shared<IconButton>(ICON_FILE_COPY);
+
+  auto gridButton = std::make_shared<IconButton>(ICON_GRID);
+
+  auto settingsButton = std::make_shared<IconButton>(ICON_GEAR);
 
   {
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
 
     newDocButton->setStrategy(newDocStrat);
+    addShortcut(newDocStrat, KEY_N, keyboardShortcutMod());
   }
 
   {
@@ -40,18 +59,29 @@ ui::AppUi::AppUi()
         std::make_shared<strategy::SaveDocumentStrategy>(editor);
 
     saveDocButton->setStrategy(saveDocStrat);
+    addShortcut(saveDocStrat, KEY_S, keyboardShortcutMod());
+  }
+
+  {
+    auto exportStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->exportDocument("png"); });
+
+    exportDocButton->setStrategy(exportStrat);
+    addShortcut(exportStrat, KEY_E, keyboardShortcutMod());
   }
 
   {
     auto undoStrat = std::make_shared<strategy::UndoStrategy>(editor);
 
     undoButton->setStrategy(undoStrat);
+    addShortcut(undoStrat, KEY_Z, keyboardShortcutMod());
   }
 
   {
     auto redoStrat = std::make_shared<strategy::RedoStrategy>(editor);
 
     redoButton->setStrategy(redoStrat);
+    addShortcut(redoStrat, KEY_Y, keyboardShortcutMod());
   }
 
   {
@@ -64,6 +94,7 @@ ui::AppUi::AppUi()
     auto selectStrat = std::make_shared<strategy::SetSelectStrategy>(editor);
 
     selectButton->setStrategy(selectStrat);
+    addShortcut(selectStrat, KEY_Q);
   }
 
   {
@@ -77,6 +108,7 @@ ui::AppUi::AppUi()
         editor, rect, ICON_PLAYER_STOP);
 
     insertRectButton->setStrategy(setRectStrat);
+    addShortcut(setRectStrat, KEY_R);
   }
 
   {
@@ -90,10 +122,105 @@ ui::AppUi::AppUi()
         editor, circle, ICON_PLAYER_RECORD);
 
     insertCircleButton->setStrategy(setCircleStrat);
+
+    addShortcut(setCircleStrat, KEY_E);
+  }
+
+  {
+    auto poly = std::make_shared<figure::PolyFigure>(5);
+    poly->initializeRegularPolygon(20);
+    poly->setFill(PINK);
+    poly->setStroke(BLACK);
+    poly->setStrokeWeight(1);
+
+    auto setPolyStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
+        editor, poly, ICON_STAR);
+
+    insertPolyButton->setStrategy(setPolyStrat);
+
+    addShortcut(setPolyStrat, KEY_T);
+  }
+
+  {
+    auto line = std::make_shared<figure::PolyFigure>(2);
+    line->setOffset(0, {30, 30});
+    line->setStroke(BLACK);
+    line->setStrokeWeight(3);
+
+    auto setLineStrat = std::make_shared<strategy::SetFigureInsertStrategy>(
+        editor, line, ICON_CROSSLINE);
+
+    insertLineButton->setStrategy(setLineStrat);
+    addShortcut(setLineStrat, KEY_L);
+  }
+
+  {
+    auto groupStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->groupFigures(); });
+
+    groupButton->setStrategy(groupStrat);
+    addShortcut(groupStrat, KEY_G, keyboardShortcutMod());
+  }
+
+  {
+    auto ungroupStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->ungroupFigures(); });
+
+    ungroupButton->setStrategy(ungroupStrat);
+    addShortcut(ungroupStrat, KEY_U, keyboardShortcutMod());
+  }
+
+  {
+    auto moveLowerStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->changeFigureOrder(-1); });
+
+    moveLowerButton->setStrategy(moveLowerStrat);
+    addShortcut(moveLowerStrat, KEY_PAGE_DOWN);
+  }
+
+  {
+    auto moveHigherStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->changeFigureOrder(+1); });
+
+    moveHigherButton->setStrategy(moveHigherStrat);
+    addShortcut(moveHigherStrat, KEY_PAGE_UP);
+  }
+
+  {
+    auto removeStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->removeFigure(); });
+
+    removeFigureButton->setStrategy(removeStrat);
+    addShortcut(removeStrat, KEY_DELETE);
+  }
+
+  {
+    auto dupStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->duplicateFigure(); });
+
+    dupFigureButton->setStrategy(dupStrat);
+    addShortcut(dupStrat, KEY_D, keyboardShortcutMod());
+  }
+
+  {
+    auto gridStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->toggleGrid(); });
+
+    gridButton->setStrategy(gridStrat);
+    addShortcut(gridStrat, KEY_I, keyboardShortcutMod());
+  }
+
+  {
+    auto settingsStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->setMode(Editor::Mode::DocumentProperties); });
+
+    settingsButton->setStrategy(settingsStrat);
+    addShortcut(settingsStrat, KEY_PERIOD, keyboardShortcutMod());
   }
 
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
+  toolbar->addWidget(std::move(exportDocButton));
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(undoButton));
   toolbar->addWidget(std::move(redoButton));
@@ -102,12 +229,31 @@ ui::AppUi::AppUi()
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(insertRectButton));
   toolbar->addWidget(std::move(insertCircleButton));
+  toolbar->addWidget(std::move(insertPolyButton));
+  toolbar->addWidget(std::move(insertLineButton));
+  toolbar->addWidget(nullptr);
+  toolbar->addWidget(std::move(groupButton));
+  toolbar->addWidget(std::move(ungroupButton));
+  toolbar->addWidget(std::move(moveLowerButton));
+  toolbar->addWidget(std::move(moveHigherButton));
+  toolbar->addWidget(std::move(removeFigureButton));
+  toolbar->addWidget(std::move(dupFigureButton));
+  toolbar->addWidget(nullptr);
+  toolbar->addWidget(std::move(gridButton));
+  toolbar->addWidget(nullptr);
+  toolbar->addWidget(std::move(settingsButton));
 }
 
 void ui::AppUi::update() {
   tabBar->update();
   toolbar->update();
   editor->update();
+
+  if (editor->getMode() != Editor::Mode::DocumentProperties) {
+    for (auto& ks : shortcuts) {
+      ks.update();
+    }
+  }
 }
 
 void ui::AppUi::setRect(const Rectangle& rect) {
@@ -116,4 +262,12 @@ void ui::AppUi::setRect(const Rectangle& rect) {
   toolbar->setRect({rect.x, rect.y + 24, rect.width, 32});
   editor->setRect(
       {rect.x, rect.y + 24 + 32, rect.width, rect.height - 24 - 32});
+}
+
+void ui::AppUi::addShortcut(std::shared_ptr<strategy::Strategy<>> strat,
+                            int key,
+                            int mod) {
+  KeyboardShortcut ks(key, mod);
+  ks.setStrategy(strat);
+  shortcuts.push_back(ks);
 }

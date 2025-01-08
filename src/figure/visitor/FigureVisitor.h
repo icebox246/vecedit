@@ -7,6 +7,7 @@ namespace figure {
 class FigureGroup;
 class RectFigure;
 class CircleFigure;
+class PolyFigure;
 
 }  // namespace figure
 
@@ -19,6 +20,7 @@ class FigureVisitor {
   virtual void visit(std::shared_ptr<FigureGroup> rect) = 0;
   virtual void visit(std::shared_ptr<RectFigure> rect) = 0;
   virtual void visit(std::shared_ptr<CircleFigure> circle) = 0;
+  virtual void visit(std::shared_ptr<PolyFigure> poly) = 0;
 };
 
 }  // namespace figure::visitor

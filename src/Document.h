@@ -26,10 +26,11 @@ class Document {
       const std::filesystem::path& path);
   static std::vector<std::filesystem::path> getDocumentNames();
 
-  Vector2 getDimenstions();
+  Vector2 getDimensions();
   void setDimenstions(Vector2 newDims);
   std::shared_ptr<figure::FigureGroup> getRoot() { return root; }
   const std::filesystem::path& getFilePath();
+  void setFilePath(std::filesystem::path);
 
   void close() {
     auto it = std::ranges::find_if(documents.begin(), documents.end(),
