@@ -33,7 +33,7 @@ std::vector<std::filesystem::path> Document::getDocumentNames() {
   return result;
 }
 
-Vector2 Document::getDimenstions() {
+Vector2 Document::getDimensions() {
   return dimensions;
 }
 
@@ -43,6 +43,10 @@ void Document::setDimenstions(Vector2 newDims) {
 
 const std::filesystem::path& Document::getFilePath() {
   return filepath;
+}
+
+void Document::setFilePath(std::filesystem::path newPath) {
+  filepath = std::move(newPath);
 }
 
 command::CommandManager& Document::getCommandManager() {

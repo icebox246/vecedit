@@ -33,6 +33,7 @@ set(SOURCE
     src/ui/Editor.cpp
     src/ui/FigurePropertiesPanel.cpp
     src/ui/FigureHierarchyPanel.cpp
+    src/ui/DocumentPropertiesView.cpp
     
     src/ui/strategy/NewDocumentStrategy.cpp
     src/ui/strategy/SaveDocumentStrategy.cpp

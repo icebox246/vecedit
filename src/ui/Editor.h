@@ -5,6 +5,7 @@
 #include <optional>
 
 #include "../Document.h"
+#include "DocumentPropertiesView.h"
 #include "FigureHierarchyPanel.h"
 #include "FigurePropertiesPanel.h"
 #include "Widget.h"
@@ -13,7 +14,7 @@ namespace ui {
 
 class Editor : public Widget, public std::enable_shared_from_this<Editor> {
  public:
-  enum class Mode { Select, Insert };
+  enum class Mode { Select, Insert, DocumentProperties };
 
  private:
   std::shared_ptr<Document> doc;
@@ -29,6 +30,8 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   std::shared_ptr<FigurePropertiesPanel> propsPanel;
   std::shared_ptr<FigureHierarchyPanel> hierarchyPanel;
 
+  std::shared_ptr<DocumentPropertiesView> documentPropertiesView;
+
   GuiIconName cursorIcon = ICON_NONE;
 
   bool useGrid = false;
@@ -43,6 +46,7 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   void setDocument(std::shared_ptr<Document> doc);
   void resetCamera();
   void setMode(Mode newMode);
+  Mode getMode();
   void setFigurePrototype(std::shared_ptr<figure::Figure> newProto);
   void setCursorIcon(GuiIconName icon);
   void undo();

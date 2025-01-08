@@ -45,6 +45,8 @@ ui::AppUi::AppUi()
 
   auto gridButton = std::make_shared<IconButton>(ICON_GRID);
 
+  auto settingsButton = std::make_shared<IconButton>(ICON_GEAR);
+
   {
     auto newDocStrat = std::make_shared<strategy::NewDocumentStrategy>(tabBar);
 
@@ -136,7 +138,7 @@ ui::AppUi::AppUi()
 
     insertPolyButton->setStrategy(setPolyStrat);
 
-    addShortcut(setPolyStrat, KEY_Y);
+    addShortcut(setPolyStrat, KEY_T);
   }
 
   {
@@ -208,6 +210,14 @@ ui::AppUi::AppUi()
     addShortcut(gridStrat, KEY_I, keyboardShortcutMod());
   }
 
+  {
+    auto settingsStrat = std::make_shared<strategy::FunctorStrategy<>>(
+        [this]() { editor->setMode(Editor::Mode::DocumentProperties); });
+
+    settingsButton->setStrategy(settingsStrat);
+    addShortcut(settingsStrat, KEY_PERIOD, keyboardShortcutMod());
+  }
+
   toolbar->addWidget(std::move(newDocButton));
   toolbar->addWidget(std::move(saveDocButton));
   toolbar->addWidget(std::move(exportDocButton));
@@ -230,6 +240,8 @@ ui::AppUi::AppUi()
   toolbar->addWidget(std::move(dupFigureButton));
   toolbar->addWidget(nullptr);
   toolbar->addWidget(std::move(gridButton));
+  toolbar->addWidget(nullptr);
+  toolbar->addWidget(std::move(settingsButton));
 }
 
 void ui::AppUi::update() {
@@ -237,8 +249,10 @@ void ui::AppUi::update() {
   toolbar->update();
   editor->update();
 
-  for (auto& ks : shortcuts) {
-    ks.update();
+  if (editor->getMode() != Editor::Mode::DocumentProperties) {
+    for (auto& ks : shortcuts) {
+      ks.update();
+    }
   }
 }
 

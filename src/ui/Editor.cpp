@@ -17,6 +17,7 @@
 #include "../figure/visitor/RendererVisitor.h"
 #include "../figure/visitor/SvgSerializerVisitor.h"
 #include "../util.h"
+#include "strategy/FunctorStrategy.h"
 
 namespace {
 constexpr auto PropsPanelWidth = 300;
@@ -27,8 +28,13 @@ constexpr auto GridSpacing = 5;
 
 ui::Editor::Editor()
     : propsPanel(std::make_shared<FigurePropertiesPanel>()),
-      hierarchyPanel(std::make_shared<FigureHierarchyPanel>()) {
+      hierarchyPanel(std::make_shared<FigureHierarchyPanel>()),
+      documentPropertiesView(std::make_shared<DocumentPropertiesView>()) {
   resetCamera();
+
+  documentPropertiesView->setDoneStrategy(
+      std::make_shared<strategy::FunctorStrategy<>>(
+          [this]() { setMode(Mode::Select); }));
 }
 
 void ui::Editor::update() {
@@ -39,6 +45,11 @@ void ui::Editor::update() {
                    200, 20};
 
     GuiLabel(r, GuiIconText(ICON_FILE_ADD, "Create new document"));
+    return;
+  }
+
+  if (mode == Mode::DocumentProperties) {
+    documentPropertiesView->update();
     return;
   }
 
@@ -65,8 +76,8 @@ void ui::Editor::update() {
   BeginMode2D(camera);
 
   {
-    DrawRectangleV({5, 5}, doc->getDimenstions(), DARKGRAY);
-    DrawRectangleV({0, 0}, doc->getDimenstions(), WHITE);
+    DrawRectangleV({5, 5}, doc->getDimensions(), DARKGRAY);
+    DrawRectangleV({0, 0}, doc->getDimensions(), WHITE);
     if (useGrid)
       drawGrid();
 
@@ -80,6 +91,9 @@ void ui::Editor::update() {
       break;
     case Mode::Insert:
       processModeInsert();
+      break;
+    case Mode::DocumentProperties:
+      assert(false);
       break;
   }
 
@@ -96,6 +110,9 @@ void ui::Editor::update() {
         break;
       case Mode::Insert:
         modeString = "INSERT";
+        break;
+      case Mode::DocumentProperties:
+        assert(false);
         break;
     }
 
@@ -130,6 +147,15 @@ void ui::Editor::setRect(const Rectangle& rect) {
                        PropsPanelWidth, rect.height});
 
   hierarchyPanel->setRect({rect.x, rect.y, HierarchyPanelWidth, rect.height});
+
+  auto paddedRectagle = Rectangle{
+      rect.x + rect.width / 2 - 200,
+      rect.y + rect.height / 2 - 100,
+      400,
+      200,
+  };
+
+  documentPropertiesView->setRect(paddedRectagle);
 }
 
 void ui::Editor::setDocument(std::shared_ptr<Document> newDoc) {
@@ -143,17 +169,32 @@ void ui::Editor::setDocument(std::shared_ptr<Document> newDoc) {
 
   propsPanel->setDocument(doc);
   hierarchyPanel->setDocument(doc);
+
+  if (mode == Mode::DocumentProperties) {
+    setMode(Mode::Select);
+  }
 }
 
 void ui::Editor::resetCamera() {
   camera.zoom = 1;
   if (doc) {
-    camera.target = doc->getDimenstions() * 0.5f;
+    camera.target = doc->getDimensions() * 0.5f;
   }
 }
 
 void ui::Editor::setMode(Mode newMode) {
+  if (!doc || mode == newMode)
+    return;
+
   mode = newMode;
+
+  if (newMode == Mode::DocumentProperties) {
+    documentPropertiesView->setDocumentAndUpdateInfo(doc);
+  }
+}
+
+ui::Editor::Mode ui::Editor::getMode() {
+  return mode;
 }
 
 void ui::Editor::setFigurePrototype(std::shared_ptr<figure::Figure> newProto) {
@@ -405,7 +446,7 @@ void ui::Editor::saveDocument() {
   if (!doc)
     return;
 
-  figure::visitor::SvgSerializerVisitor serializer(doc->getDimenstions());
+  figure::visitor::SvgSerializerVisitor serializer(doc->getDimensions());
 
   doc->getRoot()->accept(serializer);
 
@@ -416,8 +457,7 @@ void ui::Editor::exportDocument(std::string format) {
   if (!doc)
     return;
 
-  figure::visitor::BitmapRendererVisitor renderer(format,
-                                                  doc->getDimenstions());
+  figure::visitor::BitmapRendererVisitor renderer(format, doc->getDimensions());
 
   renderer.beginMode();
 
@@ -431,11 +471,11 @@ void ui::Editor::toggleGrid() {
 }
 
 void ui::Editor::drawGrid() {
-  for (int x = 0; x < doc->getDimenstions().x; x += GridSpacing) {
-    DrawLine(x, 0, x, doc->getDimenstions().y, LIGHTGRAY);
+  for (int x = 0; x < doc->getDimensions().x; x += GridSpacing) {
+    DrawLine(x, 0, x, doc->getDimensions().y, LIGHTGRAY);
   }
 
-  for (int y = 0; y < doc->getDimenstions().y; y += GridSpacing) {
-    DrawLine(0, y, doc->getDimenstions().x, y, LIGHTGRAY);
+  for (int y = 0; y < doc->getDimensions().y; y += GridSpacing) {
+    DrawLine(0, y, doc->getDimensions().x, y, LIGHTGRAY);
   }
 }
