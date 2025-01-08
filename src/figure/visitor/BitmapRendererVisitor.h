@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <cassert>
 #include <filesystem>
+#include <format>
 #include <string>
 
 #include "RendererVisitor.h"
@@ -34,6 +35,7 @@ class BitmapRendererVisitor : public RendererVisitor {
 
     Image img = LoadImageFromTexture(renderTex.texture);
 
+    ImageFlipVertical(&img);
     ExportImage(img, fp.c_str());
 
     UnloadImage(img);
