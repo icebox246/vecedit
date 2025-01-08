@@ -1,6 +1,6 @@
 #pragma once
 
-#include <rayLib.h>
+#include <raylib.h>
 #include <cassert>
 #include <filesystem>
 #include <string>
