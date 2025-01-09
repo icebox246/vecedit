@@ -11,57 +11,11 @@ constexpr auto ElementHeight = 20;
 }
 
 void ui::DocumentPropertiesView::update() {
-  auto subRect = Rectangle{rect.x, rect.y, rect.width, ElementHeight};
+  auto subRect = std::make_shared<Rectangle>(rect.x, rect.y, rect.width, ElementHeight);
 
-  auto mouse = GetMousePosition();
-
-  {
-    GuiLabel(subRect, "Filename");
-    subRect.y += ElementHeight;
-
-    if (GuiTextBox(subRect, filenameText, sizeof(filenameText),
-                   selectedFilename)) {
-      selectedFilename = !selectedFilename;
-    }
-    subRect.y += ElementHeight;
-  }
-
-  {
-    GuiLabel(subRect, "Width");
-    subRect.y += ElementHeight;
-
-    if (GuiTextBox(subRect, widthText, sizeof(widthText), selectedWidth)) {
-      selectedWidth = !selectedWidth;
-    }
-    subRect.y += ElementHeight;
-  }
-
-  {
-    GuiLabel(subRect, "Height");
-    subRect.y += ElementHeight;
-
-    if (GuiTextBox(subRect, heightText, sizeof(heightText), selectedHeight)) {
-      selectedHeight = !selectedHeight;
-    }
-    subRect.y += ElementHeight;
-  }
-
-  {
-    subRect.y += ElementHeight;
-
-    if (GuiButton(subRect, "Apply")) {
-      if (doneStrategy)
-        doneStrategy->execute();
-
-      std::filesystem::path newPath(filenameText);
-      Vector2 newDims{static_cast<float>(atof(widthText)),
-                      static_cast<float>(atof(heightText))};
-
-      doc->getCommandManager().addAndExecCommand(
-          std::make_shared<command::ChangeDocumentPropertiesCommand>(
-              doc, newPath, newDims));
-    }
-  }
+  setFilename(subRect);
+  setDimensions(subRect);
+  setApply(subRect);
 }
 
 void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
@@ -77,4 +31,56 @@ void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
 
   auto hs = std::format("{:.0f}", dims.y);
   std::strcpy(heightText, hs.c_str());
+}
+void ui::DocumentPropertiesView::setFilename(std::shared_ptr<Rectangle> subRect) {
+
+  {
+    GuiLabel(*subRect, "Filename");
+    subRect->y += ElementHeight;
+
+    if (GuiTextBox(*subRect, filenameText, sizeof(filenameText),
+                   selectedFilename)) {
+      selectedFilename = !selectedFilename;
+    }
+    subRect->y += ElementHeight;
+  }
+}
+void ui::DocumentPropertiesView::setDimensions(std::shared_ptr<Rectangle> subRect) {
+  {
+    GuiLabel(*subRect, "Width");
+    subRect->y += ElementHeight;
+
+    if (GuiTextBox(*subRect, widthText, sizeof(widthText), selectedWidth)) {
+      selectedWidth = !selectedWidth;
+    }
+    subRect->y += ElementHeight;
+  }
+
+  {
+    GuiLabel(*subRect, "Height");
+    subRect->y += ElementHeight;
+
+    if (GuiTextBox(*subRect, heightText, sizeof(heightText), selectedHeight)) {
+      selectedHeight = !selectedHeight;
+    }
+    subRect->y += ElementHeight;
+  }
+}
+void ui::DocumentPropertiesView::setApply(std::shared_ptr<Rectangle> subRect) {
+  {
+    subRect->y += ElementHeight;
+
+    if (GuiButton(*subRect, "Apply")) {
+      if (doneStrategy)
+        doneStrategy->execute();
+
+      std::filesystem::path newPath(filenameText);
+      Vector2 newDims{static_cast<float>(atof(widthText)),
+                      static_cast<float>(atof(heightText))};
+
+      doc->getCommandManager().addAndExecCommand(
+          std::make_shared<command::ChangeDocumentPropertiesCommand>(
+              doc, newPath, newDims));
+    }
+  }
 }
