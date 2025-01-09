@@ -32,6 +32,12 @@ class FigurePropertiesPanel : public Widget {
 
  private:
   void registerChangePropsCommand();
+  bool drawPanelAndCheckFigure();
+  void storeStartPropsIfNeeded();
+  float updateColor(float yOffset);
+  float updateColorEditMode(float yOffset);
+  float updateStrokeWeight(float yOffset);
+  void commitChangesIfNeeded();
 };
 
 }  // namespace ui
