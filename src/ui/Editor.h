@@ -70,6 +70,13 @@ class Editor : public Widget, public std::enable_shared_from_this<Editor> {
   void processModeSelect();
   void processModeInsert();
   void drawGrid();
+  void handleNoDocument();
+  void handleDocumentProperties();
+  void updateCamera();
+  void beginEditorView();
+  void renderMainContent();
+  void renderStatusBar();
+  void renderOverlays();
 };
 
 }  // namespace ui
