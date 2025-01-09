@@ -11,11 +11,11 @@ void ui::FigurePropertiesPanel::update() {
   storeStartPropsIfNeeded();
   float yOffset = rect.y + 30;
 
-  yOffset = updateColor(yOffset);
+  updateColor(yOffset);
 
-  yOffset = updateColorEditMode(yOffset);
+  updateColorEditMode(yOffset);
 
-  yOffset = updateStrokeWeight(yOffset);
+  updateStrokeWeight(yOffset);
 
   commitChangesIfNeeded();
 }
@@ -62,7 +62,7 @@ void ui::FigurePropertiesPanel::storeStartPropsIfNeeded() {
   }
 }
 
-float ui::FigurePropertiesPanel::updateColor(float yOffset) {
+void ui::FigurePropertiesPanel::updateColor(float& yOffset) {
   Color c;
 
   switch (colorEditMode) {
@@ -99,20 +99,20 @@ float ui::FigurePropertiesPanel::updateColor(float yOffset) {
     uncommitedChanges = true;
   }
 
-  return yOffset += 30;
+  yOffset += 30;
 }
 
-float ui::FigurePropertiesPanel::updateColorEditMode(float yOffset) {
+void ui::FigurePropertiesPanel::updateColorEditMode(float& yOffset) {
   int selection = (int)colorEditMode;
   GuiToggleGroup(Rectangle{rect.x + 10, yOffset, (rect.width - 40) / 2, 20},
                  "Fill;Stroke", (int*)&selection);
 
   colorEditMode = (ColorMode)(selection);
 
-  return yOffset += 30;
+  yOffset += 30;
 }
 
-float ui::FigurePropertiesPanel::updateStrokeWeight(float yOffset) {
+void ui::FigurePropertiesPanel::updateStrokeWeight(float& yOffset) {
   float f = editedFig->getStrokeWeight();
   auto oldF = f;
 
@@ -130,8 +130,6 @@ float ui::FigurePropertiesPanel::updateStrokeWeight(float yOffset) {
     editedFig->setStrokeWeight(f);
     uncommitedChanges = true;
   }
-
-  return yOffset;
 }
 
 void ui::FigurePropertiesPanel::commitChangesIfNeeded() {

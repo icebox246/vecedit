@@ -34,9 +34,9 @@ class FigurePropertiesPanel : public Widget {
   void registerChangePropsCommand();
   bool drawPanelAndCheckFigure();
   void storeStartPropsIfNeeded();
-  float updateColor(float yOffset);
-  float updateColorEditMode(float yOffset);
-  float updateStrokeWeight(float yOffset);
+  void updateColor(float& yOffset);
+  void updateColorEditMode(float& yOffset);
+  void updateStrokeWeight(float& yOffset);
   void commitChangesIfNeeded();
 };
 
