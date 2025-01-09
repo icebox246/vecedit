@@ -31,12 +31,12 @@ ui::AppUi::AppUi()
   setupFileOperationButtons();
   setupUndoRedoButtons();
   setupMoveButtons();
-  setupInsertRectButtons();
-  setupInsertCircleButtons();
-  setupInsertPolyButtons();
-  setupInsertLineButtons();
+  setupInsertRectButton();
+  setupInsertCircleButton();
+  setupInsertPolyButton();
+  setupInsertLineButton();
   setupGroupButtons();
-  setupMoveDirectionButtons();
+  setupOrderChangeButtons();
   setupFigureExistenceButtons();
   setupSettingsButtons();
 }
@@ -139,7 +139,7 @@ void ui::AppUi::setupMoveButtons() {
   toolbar->addWidget(std::move(selectButton));
 }
 
-void ui::AppUi::setupInsertRectButtons() {
+void ui::AppUi::setupInsertRectButton() {
   auto insertRectButton = std::make_shared<IconButton>(ICON_PLAYER_STOP);
 
   {
@@ -160,7 +160,7 @@ void ui::AppUi::setupInsertRectButtons() {
   toolbar->addWidget(std::move(insertRectButton));
 }
 
-void ui::AppUi::setupInsertCircleButtons() {
+void ui::AppUi::setupInsertCircleButton() {
   auto insertCircleButton = std::make_shared<IconButton>(ICON_PLAYER_RECORD);
 
   {
@@ -181,7 +181,7 @@ void ui::AppUi::setupInsertCircleButtons() {
   toolbar->addWidget(std::move(insertCircleButton));
 }
 
-void ui::AppUi::setupInsertPolyButtons() {
+void ui::AppUi::setupInsertPolyButton() {
   auto insertPolyButton = std::make_shared<IconButton>(ICON_STAR);
 
   {
@@ -202,7 +202,7 @@ void ui::AppUi::setupInsertPolyButtons() {
   toolbar->addWidget(std::move(insertPolyButton));
 }
 
-void ui::AppUi::setupInsertLineButtons() {
+void ui::AppUi::setupInsertLineButton() {
   auto insertLineButton = std::make_shared<IconButton>(ICON_CROSSLINE);
 
   {
@@ -246,7 +246,7 @@ void ui::AppUi::setupGroupButtons() {
   toolbar->addWidget(std::move(ungroupButton));
 }
 
-void ui::AppUi::setupMoveDirectionButtons() {
+void ui::AppUi::setupOrderChangeButtons() {
   auto moveHigherButton = std::make_shared<IconButton>(ICON_STEP_OUT);
   auto moveLowerButton = std::make_shared<IconButton>(ICON_STEP_INTO);
 

@@ -29,12 +29,12 @@ class AppUi : public Widget {
   void setupFileOperationButtons();
   void setupUndoRedoButtons();
   void setupMoveButtons();
-  void setupInsertRectButtons();
-  void setupInsertCircleButtons();
-  void setupInsertPolyButtons();
-  void setupInsertLineButtons();
+  void setupInsertRectButton();
+  void setupInsertCircleButton();
+  void setupInsertPolyButton();
+  void setupInsertLineButton();
   void setupGroupButtons();
-  void setupMoveDirectionButtons();
+  void setupOrderChangeButtons();
   void setupFigureExistenceButtons();
   void setupSettingsButtons();
 };

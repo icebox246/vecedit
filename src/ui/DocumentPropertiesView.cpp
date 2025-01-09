@@ -13,9 +13,9 @@ constexpr auto ElementHeight = 20;
 void ui::DocumentPropertiesView::update() {
   auto subRect = Rectangle{rect.x, rect.y, rect.width, ElementHeight};
 
-  setFilename(subRect);
-  setDimensions(subRect);
-  setApply(subRect);
+  updateFilenameField(subRect);
+  updateDimensionFields(subRect);
+  updateApplyButton(subRect);
 }
 
 void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
@@ -32,8 +32,7 @@ void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
   auto hs = std::format("{:.0f}", dims.y);
   std::strcpy(heightText, hs.c_str());
 }
-void ui::DocumentPropertiesView::setFilename(Rectangle& subRect) {
-
+void ui::DocumentPropertiesView::updateFilenameField(Rectangle& subRect) {
   {
     GuiLabel(subRect, "Filename");
     subRect.y += ElementHeight;
@@ -45,7 +44,7 @@ void ui::DocumentPropertiesView::setFilename(Rectangle& subRect) {
     subRect.y += ElementHeight;
   }
 }
-void ui::DocumentPropertiesView::setDimensions(Rectangle& subRect) {
+void ui::DocumentPropertiesView::updateDimensionFields(Rectangle& subRect) {
   {
     GuiLabel(subRect, "Width");
     subRect.y += ElementHeight;
@@ -66,7 +65,7 @@ void ui::DocumentPropertiesView::setDimensions(Rectangle& subRect) {
     subRect.y += ElementHeight;
   }
 }
-void ui::DocumentPropertiesView::setApply(Rectangle& subRect) {
+void ui::DocumentPropertiesView::updateApplyButton(Rectangle& subRect) {
   {
     subRect.y += ElementHeight;
 
