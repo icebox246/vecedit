@@ -4,7 +4,7 @@
 #include <cstring>
 #include <format>
 
-#include "../commands/ChangeDocumentProperties.h"
+#include "../ui/command/ChangeDocumentProperties.h"
 
 namespace {
 constexpr auto ElementHeight = 20;

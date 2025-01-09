@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../Document.h"
-#include "../commands/ChangeFigurePropsCommand.h"
+#include "../ui/command/ChangeFigurePropsCommand.h"
 #include "../figure/Figure.h"
 #include "Widget.h"
 

@@ -26,8 +26,8 @@ int main() {
         appUi.setRect({
             0,
             0,
-            static_cast<float>(GetRenderWidth()),
-            static_cast<float>(GetRenderHeight()),
+            static_cast<float>(GetScreenWidth()),
+            static_cast<float>(GetScreenHeight()),
         });
 
       appUi.update();

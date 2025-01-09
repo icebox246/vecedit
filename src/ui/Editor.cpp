@@ -5,12 +5,12 @@
 #include <format>
 #include <utility>
 
-#include "../commands/AddFiguresCommand.h"
-#include "../commands/ChangeOrderCommand.h"
-#include "../commands/GroupFiguresCommand.h"
-#include "../commands/MovePointCommand.h"
-#include "../commands/RemoveFiguresCommand.h"
-#include "../commands/UngroupFiguresCommand.h"
+#include "../ui/command/AddFiguresCommand.h"
+#include "../ui/command/ChangeOrderCommand.h"
+#include "../ui/command/GroupFiguresCommand.h"
+#include "../ui/command/MovePointCommand.h"
+#include "../ui/command/RemoveFiguresCommand.h"
+#include "../ui/command/UngroupFiguresCommand.h"
 #include "../figure/Figure.h"
 #include "../figure/visitor/BitmapRendererVisitor.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
