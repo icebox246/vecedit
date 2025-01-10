@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../figure/Figure.h"
-#include "../figure/FigureGroup.h"
+#include "../../figure/Figure.h"
+#include "../../figure/FigureGroup.h"
 #include "Command.h"
 
 namespace command {

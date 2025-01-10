@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../Document.h"
+#include "../../Document.h"
 #include "Command.h"
 
 namespace command {

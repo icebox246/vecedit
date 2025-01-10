@@ -25,6 +25,18 @@ class AppUi : public Widget {
   void addShortcut(std::shared_ptr<strategy::Strategy<>> strat,
                    int key,
                    int mod = 0);
+
+  void setupFileOperationButtons();
+  void setupUndoRedoButtons();
+  void setupMoveButtons();
+  void setupInsertRectButton();
+  void setupInsertCircleButton();
+  void setupInsertPolyButton();
+  void setupInsertLineButton();
+  void setupGroupButtons();
+  void setupOrderChangeButtons();
+  void setupFigureExistenceButtons();
+  void setupSettingsButtons();
 };
 
 }  // namespace ui

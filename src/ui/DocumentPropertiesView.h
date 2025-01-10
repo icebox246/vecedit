@@ -27,6 +27,9 @@ class DocumentPropertiesView : public Widget {
   void setDoneStrategy(std::shared_ptr<strategy::Strategy<>> strat) {
     doneStrategy = std::move(strat);
   }
+  void updateFilenameField(Rectangle& subRect);
+  void updateDimensionFields(Rectangle& subRect);
+  void updateApplyButton(Rectangle& subRect);
 };
 
 }  // namespace ui

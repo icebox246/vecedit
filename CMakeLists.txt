@@ -54,7 +54,7 @@ set(SOURCE
     src/figure/adapter/PolyFigurePointEditor.cpp
     src/figure/adapter/FigureGroupPointEditor.cpp
 
-    src/commands/CommandManager.cpp
+    src/ui/command/CommandManager.cpp
 )
 
 set(THIRDPARYSOURCE

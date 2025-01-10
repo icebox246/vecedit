@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "commands/CommandManager.h"
+#include "ui/command/CommandManager.h"
 #include "figure/FigureGroup.h"
 
 class Document {

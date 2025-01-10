@@ -5,17 +5,17 @@
 #include <format>
 #include <utility>
 
-#include "../commands/AddFiguresCommand.h"
-#include "../commands/ChangeOrderCommand.h"
-#include "../commands/GroupFiguresCommand.h"
-#include "../commands/MovePointCommand.h"
-#include "../commands/RemoveFiguresCommand.h"
-#include "../commands/UngroupFiguresCommand.h"
 #include "../figure/Figure.h"
 #include "../figure/visitor/BitmapRendererVisitor.h"
 #include "../figure/visitor/PointIntersectionVisitor.h"
 #include "../figure/visitor/RendererVisitor.h"
 #include "../figure/visitor/SvgSerializerVisitor.h"
+#include "../ui/command/AddFiguresCommand.h"
+#include "../ui/command/ChangeOrderCommand.h"
+#include "../ui/command/GroupFiguresCommand.h"
+#include "../ui/command/MovePointCommand.h"
+#include "../ui/command/RemoveFiguresCommand.h"
+#include "../ui/command/UngroupFiguresCommand.h"
 #include "../util.h"
 #include "strategy/FunctorStrategy.h"
 
@@ -39,98 +39,26 @@ ui::Editor::Editor()
 
 void ui::Editor::update() {
   if (!doc) {
-    DrawRectangleRec(rect, RAYWHITE);
-
-    Rectangle r = {rect.x + rect.width / 2 - 100, rect.y + rect.height / 2 - 10,
-                   200, 20};
-
-    GuiLabel(r, GuiIconText(ICON_FILE_ADD, "Create new document"));
+    handleNoDocument();
     return;
   }
 
   if (mode == Mode::DocumentProperties) {
-    documentPropertiesView->update();
+    handleDocumentProperties();
     return;
   }
 
   doc->getRoot()->updateParent();
 
-  if (isFocused()) {
-    if (IsKeyDown(KEY_LEFT_CONTROL)) {
-      camera.zoom *= 1 + GetMouseWheelMoveV().y * 0.05;
-    } else if (!isOnMaxOS() && IsKeyDown(KEY_LEFT_SHIFT)) {
-      camera.target.x += GetMouseWheelMoveV().y * -15 / camera.zoom;
-    } else {
-      camera.target += GetMouseWheelMoveV() * -15 / camera.zoom;
-    }
-  }
+  if (isFocused())
+    updateCamera();
 
-  BeginScissorMode(rect.x + HierarchyPanelWidth, rect.y,
-                   rect.width - PropsPanelWidth - HierarchyPanelWidth,
-                   rect.height);
-  ClearBackground(GRAY);
-  if (isFocused()) {
-    DrawRectangleLines(rect.x + 1, rect.y + 1, rect.width - 1 - PropsPanelWidth,
-                       rect.height - 1, BLUE);
-  }
-  BeginMode2D(camera);
-
-  {
-    DrawRectangleV({5, 5}, doc->getDimensions(), DARKGRAY);
-    DrawRectangleV({0, 0}, doc->getDimensions(), WHITE);
-    if (useGrid)
-      drawGrid();
-
-    auto renderer = figure::visitor::RendererVisitor();
-    doc->getRoot()->accept(renderer);
-  }
-
-  switch (mode) {
-    case Mode::Select:
-      processModeSelect();
-      break;
-    case Mode::Insert:
-      processModeInsert();
-      break;
-    case Mode::DocumentProperties:
-      assert(false);
-      break;
-  }
-
-  EndMode2D();
-
-  {
-    Rectangle r = {rect.x + HierarchyPanelWidth, rect.y + rect.height - 20,
-                   rect.width - PropsPanelWidth - HierarchyPanelWidth, 20};
-
-    std::string modeString;
-    switch (mode) {
-      case Mode::Select:
-        modeString = "SELECT";
-        break;
-      case Mode::Insert:
-        modeString = "INSERT";
-        break;
-      case Mode::DocumentProperties:
-        assert(false);
-        break;
-    }
-
-    auto cursor = getCursorPos();
-
-    auto path = doc->getFilePath();
-
-    auto statusLine =
-        std::format("Mode: {}  |  File: {}  |  Cursor: {:7.2f}, {:7.2f}",
-                    modeString, path.string(), cursor.x, cursor.y);
-
-    GuiStatusBar(r, statusLine.c_str());
-  }
-
-  GuiDrawIcon(cursorIcon, GetMouseX() + 10, GetMouseY() + 20, 1, DARKGRAY);
+  beginEditorView();
+  renderMainContent();
+  renderStatusBar();
+  renderOverlays();
 
   EndScissorMode();
-
   propsPanel->update();
   hierarchyPanel->update();
 }
@@ -478,4 +406,89 @@ void ui::Editor::drawGrid() {
   for (int y = 0; y < doc->getDimensions().y; y += GridSpacing) {
     DrawLine(0, y, doc->getDimensions().x, y, LIGHTGRAY);
   }
+}
+
+void ui::Editor::handleNoDocument() {
+  DrawRectangleRec(rect, RAYWHITE);
+  Rectangle r = {rect.x + rect.width / 2 - 100, rect.y + rect.height / 2 - 10,
+                 200, 20};
+  GuiLabel(r, GuiIconText(ICON_FILE_ADD, "Create new document"));
+}
+void ui::Editor::handleDocumentProperties() {
+  documentPropertiesView->update();
+}
+
+void ui::Editor::updateCamera() {
+  if (IsKeyDown(KEY_LEFT_CONTROL)) {
+    camera.zoom *= 1 + GetMouseWheelMoveV().y * 0.05;
+  } else if (!isOnMaxOS() && IsKeyDown(KEY_LEFT_SHIFT)) {
+    camera.target.x += GetMouseWheelMoveV().y * -15 / camera.zoom;
+  } else {
+    camera.target += GetMouseWheelMoveV() * -15 / camera.zoom;
+  }
+}
+
+void ui::Editor::beginEditorView() {
+  BeginScissorMode(rect.x + HierarchyPanelWidth, rect.y,
+                   rect.width - PropsPanelWidth - HierarchyPanelWidth,
+                   rect.height);
+  ClearBackground(GRAY);
+  if (isFocused()) {
+    DrawRectangleLines(rect.x + 1, rect.y + 1, rect.width - 1 - PropsPanelWidth,
+                       rect.height - 1, BLUE);
+  }
+  BeginMode2D(camera);
+}
+
+void ui::Editor::renderMainContent() {
+  DrawRectangleV({5, 5}, doc->getDimensions(), DARKGRAY);
+  DrawRectangleV({0, 0}, doc->getDimensions(), WHITE);
+  if (useGrid)
+    drawGrid();
+
+  auto renderer = figure::visitor::RendererVisitor();
+  doc->getRoot()->accept(renderer);
+
+  switch (mode) {
+    case Mode::Select:
+      processModeSelect();
+      break;
+    case Mode::Insert:
+      processModeInsert();
+      break;
+    case Mode::DocumentProperties:
+      assert(false);
+      break;
+  }
+  EndMode2D();
+}
+void ui::Editor::renderStatusBar() {
+  Rectangle r = {rect.x + HierarchyPanelWidth, rect.y + rect.height - 20,
+                 rect.width - PropsPanelWidth - HierarchyPanelWidth, 20};
+
+  std::string modeString;
+  switch (mode) {
+    case Mode::Select:
+      modeString = "SELECT";
+      break;
+    case Mode::Insert:
+      modeString = "INSERT";
+      break;
+    case Mode::DocumentProperties:
+      assert(false);
+      break;
+  }
+
+  auto cursor = getCursorPos();
+
+  auto path = doc->getFilePath();
+
+  auto statusLine =
+      std::format("Mode: {}  |  File: {}  |  Cursor: {:7.2f}, {:7.2f}",
+                  modeString, path.string(), cursor.x, cursor.y);
+
+  GuiStatusBar(r, statusLine.c_str());
+}
+void ui::Editor::renderOverlays() {
+  GuiDrawIcon(cursorIcon, GetMouseX() + 10, GetMouseY() + 20, 1, DARKGRAY);
 }

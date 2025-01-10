@@ -2,7 +2,7 @@
 
 #include <ranges>
 
-#include "../commands/ToggleVisibilityCommand.h"
+#include "../ui/command/ToggleVisibilityCommand.h"
 #include "../figure/CircleFigure.h"
 #include "../figure/PolyFigure.h"
 #include "../figure/RectFigure.h"

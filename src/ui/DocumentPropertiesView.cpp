@@ -4,7 +4,7 @@
 #include <cstring>
 #include <format>
 
-#include "../commands/ChangeDocumentProperties.h"
+#include "../ui/command/ChangeDocumentProperties.h"
 
 namespace {
 constexpr auto ElementHeight = 20;
@@ -13,8 +13,26 @@ constexpr auto ElementHeight = 20;
 void ui::DocumentPropertiesView::update() {
   auto subRect = Rectangle{rect.x, rect.y, rect.width, ElementHeight};
 
-  auto mouse = GetMousePosition();
+  updateFilenameField(subRect);
+  updateDimensionFields(subRect);
+  updateApplyButton(subRect);
+}
 
+void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
+    std::shared_ptr<Document> newDoc) {
+  doc = std::move(newDoc);
+
+  std::strcpy(filenameText, doc->getFilePath().c_str());
+
+  auto dims = doc->getDimensions();
+
+  auto ws = std::format("{:.0f}", dims.x);
+  std::strcpy(widthText, ws.c_str());
+
+  auto hs = std::format("{:.0f}", dims.y);
+  std::strcpy(heightText, hs.c_str());
+}
+void ui::DocumentPropertiesView::updateFilenameField(Rectangle& subRect) {
   {
     GuiLabel(subRect, "Filename");
     subRect.y += ElementHeight;
@@ -25,7 +43,8 @@ void ui::DocumentPropertiesView::update() {
     }
     subRect.y += ElementHeight;
   }
-
+}
+void ui::DocumentPropertiesView::updateDimensionFields(Rectangle& subRect) {
   {
     GuiLabel(subRect, "Width");
     subRect.y += ElementHeight;
@@ -45,7 +64,8 @@ void ui::DocumentPropertiesView::update() {
     }
     subRect.y += ElementHeight;
   }
-
+}
+void ui::DocumentPropertiesView::updateApplyButton(Rectangle& subRect) {
   {
     subRect.y += ElementHeight;
 
@@ -62,19 +82,4 @@ void ui::DocumentPropertiesView::update() {
               doc, newPath, newDims));
     }
   }
-}
-
-void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
-    std::shared_ptr<Document> newDoc) {
-  doc = std::move(newDoc);
-
-  std::strcpy(filenameText, doc->getFilePath().c_str());
-
-  auto dims = doc->getDimensions();
-
-  auto ws = std::format("{:.0f}", dims.x);
-  std::strcpy(widthText, ws.c_str());
-
-  auto hs = std::format("{:.0f}", dims.y);
-  std::strcpy(heightText, hs.c_str());
 }

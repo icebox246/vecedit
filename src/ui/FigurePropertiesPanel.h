@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../Document.h"
-#include "../commands/ChangeFigurePropsCommand.h"
+#include "../ui/command/ChangeFigurePropsCommand.h"
 #include "../figure/Figure.h"
 #include "Widget.h"
 
@@ -32,6 +32,12 @@ class FigurePropertiesPanel : public Widget {
 
  private:
   void registerChangePropsCommand();
+  bool drawPanelAndCheckFigure();
+  void storeStartPropsIfNeeded();
+  void updateColor(float& yOffset);
+  void updateColorEditMode(float& yOffset);
+  void updateStrokeWeight(float& yOffset);
+  void commitChangesIfNeeded();
 };
 
 }  // namespace ui

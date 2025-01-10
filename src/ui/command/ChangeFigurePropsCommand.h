@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../figure/Figure.h"
+#include "../../figure/Figure.h"
 #include "Command.h"
 
 namespace command {
