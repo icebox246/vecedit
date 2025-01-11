@@ -6,8 +6,6 @@ Editor for vector graphics.
 
 Install:
 
-- `raylib` >= 5.5
-- `pkg-config`
 - `cmake` >= 3.30
 - `clang` or `gcc`
 
