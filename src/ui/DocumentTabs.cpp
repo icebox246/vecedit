@@ -12,7 +12,7 @@ void ui::DocumentTabs::update() {
   std::vector<const char*> cstrings;
   cstrings.reserve(tabNames.size());
   std::ranges::transform(tabNames, std::back_inserter(strings),
-                         [](const auto& s) { return s.filename(); });
+                         [](const auto& s) { return s.filename().string(); });
   std::ranges::transform(strings, std::back_inserter(cstrings),
                          [](const auto& s) { return s.c_str(); });
 

@@ -36,7 +36,7 @@ class BitmapRendererVisitor : public RendererVisitor {
     Image img = LoadImageFromTexture(renderTex.texture);
 
     ImageFlipVertical(&img);
-    ExportImage(img, fp.c_str());
+    ExportImage(img, fp.string().c_str());
 
     UnloadImage(img);
   }

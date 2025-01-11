@@ -171,7 +171,7 @@ void ui::Editor::processModeSelect() {
 
     if (draggedPointId && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
       auto moveCmd = std::make_shared<command::MovePointCommand>(
-          selectedFigure, *draggedPointId, mouseDragStartPos, cursor);
+          selectedFigure, *draggedPointId, mouseDragStartPos, getSnappedCursorPos());
 
       doc->getCommandManager().addCommand(moveCmd);
 
@@ -206,7 +206,7 @@ void ui::Editor::processModeSelect() {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
           clickHandled = true;
           draggedPointId = p.id;
-          mouseDragStartPos = cursor;
+          mouseDragStartPos = getSnappedCursorPos();
         }
       }
 

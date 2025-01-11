@@ -22,7 +22,7 @@ void ui::DocumentPropertiesView::setDocumentAndUpdateInfo(
     std::shared_ptr<Document> newDoc) {
   doc = std::move(newDoc);
 
-  std::strcpy(filenameText, doc->getFilePath().c_str());
+  std::strcpy(filenameText, doc->getFilePath().string().c_str());
 
   auto dims = doc->getDimensions();
 
