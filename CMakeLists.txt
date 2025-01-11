@@ -83,3 +83,5 @@ target_include_directories(VecEdit PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
 target_link_libraries(${PROJECT_NAME} raylib)
 
 target_link_libraries(VecEdit ${EXTRA_MACOS_LIBS})
+
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
