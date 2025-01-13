@@ -192,8 +192,10 @@ teksty generowane są bezpośrednio podczas rysowania każdej klatki.
 \subsection{C++20 i CMake}
 \begin{itemize}
     \item \textbf{C++20} — W projekcie używamy \texttt{std::filesystem} do obsługi plików,
-      \texttt{std::format} do wygodnego formatowania tekstu, \texttt{std::ranges}.
-    \item \textbf{CMake} — Plik \texttt{CMakeLists.txt} konfiguruje projekt
+      \texttt{std::format} do wygodnego formatowania tekstu, \texttt{std::ranges}. 
+      Wspierane są kompilatory GCC (14.2.1) i clang (18.1.8)
+
+    \item \textbf{CMake 3.30} — Plik \texttt{CMakeLists.txt} konfiguruje projekt
       i automatycznie pobiera \texttt{raylib} z GitHuba (jeśli nie jest dostępny lokalnie).
 \end{itemize}
 
@@ -222,6 +224,8 @@ z zaznaczonymi głównymi elementami interfejsu.
     \label{fig:screenshot}
 \end{figure}
 
+\textbf{TODO: dodać opisy poszczególnych guzików}
+
 \noindent Oznaczenia na zrzucie:
 \begin{enumerate}
     \item \textbf{Pasek zakładek dokumentów} — wybór otwartego projektu, 
@@ -241,6 +245,9 @@ z zaznaczonymi głównymi elementami interfejsu.
 \end{enumerate}
 
 \subsection{Podstawowe operacje}
+
+\textbf{TODO: usunąć/zmienić żeby było dla wszystkich guzików (razem ze skrótami klawiszowymi)}
+
 \begin{itemize}
     \item \textbf{Nowy dokument:} \texttt{Ctrl+N} lub ikona \emph{New}.
     \item \textbf{Zapisz:} \texttt{Ctrl+S} lub ikona \emph{Save}.
@@ -254,15 +261,16 @@ z zaznaczonymi głównymi elementami interfejsu.
 \section{Instrukcja instalacji i kompilacji}
 \begin{enumerate}
     \item \textbf{Pobranie kodu:} Sklonuj repozytorium (np. \texttt{git clone <URL>}).
-    \item \textbf{Kompilacja z użyciem CMake:}
+    \item \textbf{Kompilacja z użyciem CMake} (proces dokładnie opisany w \texttt{README.md}):
+    \item \textbf{TODO - kompilacja w CLion}
 \begin{verbatim}
 mkdir build
 cd build
 cmake ..
 make
 \end{verbatim}
-    \item \textbf{Raylib 5.5}: W razie braku lokalnego \texttt{raylib}, 
-    CMake spróbuje automatycznie pobrać i skompilować odpowiednią wersję biblioteki.
+    \item \textbf{Raylib 5.5}: CMake spróbuje automatycznie pobrać i
+      skompilować odpowiednią wersję biblioteki.
     \item \textbf{Uruchomienie}: Po kompilacji w folderze \texttt{build} znajduje się 
     plik \texttt{VecEdit} (Linux/macOS) lub \texttt{VecEdit.exe} (Windows). 
     Można go uruchomić z wiersza poleceń lub przez dwuklik. 
