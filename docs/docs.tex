@@ -7,6 +7,7 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{geometry}
+\usepackage{enumitem}
 \geometry{
     a4paper,
     left=25mm,
@@ -193,7 +194,7 @@ teksty generowane są bezpośrednio podczas rysowania każdej klatki.
 \begin{itemize}
     \item \textbf{C++20} — W projekcie używamy \texttt{std::filesystem} do obsługi plików,
       \texttt{std::format} do wygodnego formatowania tekstu, \texttt{std::ranges}. 
-      Wspierane są kompilatory GCC (14.2.1) i clang (18.1.8)
+      Wspierane są kompilatory GCC (14.2.1) i clang (18.1.8).
 
     \item \textbf{CMake 3.30} — Plik \texttt{CMakeLists.txt} konfiguruje projekt
       i automatycznie pobiera \texttt{raylib} z GitHuba (jeśli nie jest dostępny lokalnie).
@@ -214,8 +215,6 @@ cd build
 \end{itemize}
 
 \subsection{Interfejs programu — krótki opis}
-Na rysunku~\ref{fig:screenshot} przedstawiono przykładowy zrzut ekranu 
-z zaznaczonymi głównymi elementami interfejsu.
 
 \begin{figure}[h!]
     \centering
@@ -224,19 +223,33 @@ z zaznaczonymi głównymi elementami interfejsu.
     \label{fig:screenshot}
 \end{figure}
 
-\textbf{TODO: dodać opisy poszczególnych guzików}
+\noindent \textbf{TODO: dodać legendę strzałek na obrazku}
 
 \noindent Oznaczenia na zrzucie:
 \begin{enumerate}
     \item \textbf{Pasek zakładek dokumentów} — wybór otwartego projektu, 
     możliwość zamknięcia karty.
-    \item \textbf{Pasek narzędzi}:
-    \begin{itemize}
-      \item ikony nowego, zapisu, eksportu,
-      \item przyciski \texttt{undo} i \texttt{redo},
-      \item przyciski wyboru narzędzia (zaznaczanie, prostokąt, koło itp.),
-      \item ikony grupowania / rozgrupowywania.
-    \end{itemize}
+    \item \textbf{Pasek narzędzi} (z przyciskami \textbf{od A do S}):
+    \begin{enumerate}[label=\alph*)]
+        \item \textbf{New} (skrót \texttt{Ctrl+N}) — tworzy nowy dokument.
+        \item \textbf{Save} (skrót \texttt{Ctrl+S}) — zapisuje obecny dokument.
+        \item \textbf{Export} (skrót \texttt{Ctrl+E}) — eksport do \texttt{PNG}.
+        \item \textbf{Undo} (skrót \texttt{Ctrl+Z}) - cofnięcie zmian
+        \item \textbf{Redo} (skrót \texttt{Ctrl+Y}) - przywrócenie zmian
+        \item \textbf{Select} (skrót \texttt{Q}) — narzędzie zaznaczania figur.
+        \item \textbf{Insert Rect} (skrót \texttt{R}) — wstawianie prostokąta.
+        \item \textbf{Insert Circle} (skrót \texttt{E}) — wstawianie koła.
+        \item \textbf{Insert Polygon} (skrót \texttt{T}) — wstawianie wielokąta gwiazdy.
+        \item \textbf{Insert Line} (skrót \texttt{L}) — wstawianie linii.
+        \item \textbf{Group} (skrót \texttt{Ctrl+G}) - grupowanie obiektów.
+        \item \textbf{Ungroup} (skrót \texttt{Ctrl+U}) - odgrupowanie obiektów.
+        \item \textbf{Move Lower} (skrót \texttt{PageDown}) - przeniesienie w górę w hierarchii obiektów.
+        \item \textbf{Move Higher} (skrót \texttt{PageUp}) - przeniesienie w dół w hierarchii obiektów.
+        \item \textbf{Delete Figure} (skrót \texttt{Delete}) - usunięcie figury.
+        \item \textbf{Duplicate Figure} (\texttt{Ctrl+D}) - zduplikowanie figury.
+        \item \textbf{Toggle Grid} (\texttt{Ctrl+I}) — włączenie/wyłączenie siatki.
+        \item \textbf{Document Properties} (\texttt{Ctrl+.}) — otwiera panel właściwości dokumentu.
+    \end{enumerate}
     \item \textbf{Obszar roboczy} — kliknięcie w tym obszarze wstawia figurę 
     (jeśli wybrano narzędzie \emph{Insert}), zaznacza figurę (jeśli wybrano 
     narzędzie \emph{Select}) itp.
@@ -245,32 +258,39 @@ z zaznaczonymi głównymi elementami interfejsu.
 \end{enumerate}
 
 \subsection{Podstawowe operacje}
-
-\textbf{TODO: usunąć/zmienić żeby było dla wszystkich guzików (razem ze skrótami klawiszowymi)}
-
 \begin{itemize}
-    \item \textbf{Nowy dokument:} \texttt{Ctrl+N} lub ikona \emph{New}.
-    \item \textbf{Zapisz:} \texttt{Ctrl+S} lub ikona \emph{Save}.
-    \item \textbf{Eksport do PNG:} \texttt{Ctrl+E} lub ikona \emph{Export}.
+    \item \textbf{Nowy dokument:} \texttt{Ctrl+N} lub przycisk \emph{New}.
+    \item \textbf{Zapisz:} \texttt{Ctrl+S} lub przycisk \emph{Save}.
+    \item \textbf{Eksport do PNG:} \texttt{Ctrl+E} lub przycisk \emph{Export}.
     \item \textbf{Cofnij/Ponów:} \texttt{Ctrl+Z} / \texttt{Ctrl+Y}.
+    \item \textbf{Wybór narzędzi rysowania}: \texttt{Q}, \texttt{R}, \texttt{E}, \texttt{T}, \texttt{L} ...
     \item \textbf{Grupowanie i rozgrupowywanie:} \texttt{Ctrl+G} i \texttt{Ctrl+U}.
-    \item \textbf{Klonowanie figury:} zaznacz figurę, wciśnij \texttt{Ctrl+D} 
-    — powstanie duplikat w tym samym miejscu.
+    \item \textbf{Klonowanie figury:} zaznacz figurę, wciśnij \texttt{Ctrl+D}. 
+    \item \textbf{Usuwanie figury:} zaznacz figurę i wciśnij \texttt{Delete}.
+    \item \textbf{Przenoszenie warstwy figury:} \texttt{PageUp} / \texttt{PageDown}.
 \end{itemize}
+
 
 \section{Instrukcja instalacji i kompilacji}
 \begin{enumerate}
-    \item \textbf{Pobranie kodu:} Sklonuj repozytorium (np. \texttt{git clone <URL>}).
-    \item \textbf{Kompilacja z użyciem CMake} (proces dokładnie opisany w \texttt{README.md}):
-    \item \textbf{TODO - kompilacja w CLion}
-\begin{verbatim}
-mkdir build
-cd build
-cmake ..
-make
-\end{verbatim}
+    \item \textbf{Rozpakowanie zip}
+    \begin{verbatim}
+    mkdir build
+    cd build
+    cmake ..
+    make
+    \end{verbatim}
+    \item \textbf{Kompilacja z użyciem CMake} (proces opisany również w \texttt{README.md}):
+        \begin{enumerate}
+            \item Po zaimportowaniu projektu wykonać File->Reload CMake Project
+            \item Następnie po ładowaniu można odpalić projekt za pomocą 
+                przycisku "Run" lub \texttt{SHIFT+F10}
+            \item Dodatkowo w folderze \texttt{vecedit/cmake-build-debug} jest
+                plik .exe.
+        \end{enumerate}
     \item \textbf{Raylib 5.5}: CMake spróbuje automatycznie pobrać i
-      skompilować odpowiednią wersję biblioteki.
+      skompilować odpowiednią wersję biblioteki (\textbf{TODO: sprawdzić w 
+      docelowym środowisku CI/CD}).
     \item \textbf{Uruchomienie}: Po kompilacji w folderze \texttt{build} znajduje się 
     plik \texttt{VecEdit} (Linux/macOS) lub \texttt{VecEdit.exe} (Windows). 
     Można go uruchomić z wiersza poleceń lub przez dwuklik. 
@@ -280,6 +300,30 @@ make
 
 \section{Podział pracy w zespole}
 
+\paragraph{Adam Rogowski}
+\begin{itemize}
+    \item \textbf{Composite} (\texttt{FigureGroup}): stworzenie klasy grupującej figury i zarządzanie hierarchią dzieci (w tym obsługa zagnieżdżonych grup).
+    \item \textbf{Command} (w tym \texttt{RemoveFiguresCommand}, \texttt{GroupFiguresCommand} i \texttt{CommandManager}): implementacja głównego mechanizmu \texttt{undo}/\texttt{redo}, obejmująca tworzenie i cofanie poleceń.
+    \item \textbf{Zarządzanie warstwami i blokowaniem figur}: dodatkowo rozbudował \texttt{Editor} o możliwość przesuwania obiektów między warstwami oraz blokowania/odblokowywania figur w drzewie.
+    \item \textbf{Interfejs użytkownika} (\texttt{AppUi}, \texttt{Toolbar}): stworzenie paska narzędzi (z przyciskami od \texttt{New} do \texttt{Settings}), logika rozmieszczania widgetów i współpracy z \texttt{Editor} (m.in. przełączanie trybów \emph{insert} / \emph{select}).
+\end{itemize}
+
+\paragraph{Szymon Sawoń}
+\begin{itemize}
+    \item \textbf{Strategy}: implementacja akcji takich jak \texttt{SetSelectStrategy}, \texttt{OpenDocumentStrategy} oraz \texttt{FunctorStrategy} (do prostych poleceń tworzonych w oparciu o wyrażenia lambda).
+    \item \textbf{Prototype}: w \texttt{FigureBase<>} oraz poszczególnych figurach (\texttt{RectFigure}, \texttt{CircleFigure} itp.) wdrożył metodę \texttt{clone()} pozwalającą na klonowanie obiektów bez znajomości ich typu.
+    \item \textbf{Obsługa skrótów klawiaturowych} (\texttt{KeyboardShortcut}): mapowanie klawiszy na odpowiednie strategie (np. \texttt{Ctrl+N} na \texttt{NewDocumentStrategy}), przechowywanie listy skrótów i wywoływanie ich w pętli głównej.
+    \item \textbf{Interfejs użytkownika} (\texttt{AppUi}, \texttt{Toolbar}): stworzenie paska narzędzi (z przyciskami od \texttt{New} do \texttt{Settings}), logika rozmieszczania widgetów i współpracy z \texttt{Editor} (m.in. przełączanie trybów \emph{insert} / \emph{select}).
+\end{itemize}
+
+\paragraph{Bartosz Siemaszkiewicz}
+\begin{itemize}
+    \item \textbf{Visitor}: implementacja \texttt{RendererVisitor} (rysowanie figur), \texttt{SvgSerializerVisitor} (eksport do \texttt{SVG}) oraz \texttt{BitmapRendererVisitor} (eksport do \texttt{PNG}).
+    \item \textbf{Prototype}: w \texttt{FigureBase<>} oraz poszczególnych figurach (\texttt{RectFigure}, \texttt{CircleFigure} itp.) wdrożył metodę \texttt{clone()} pozwalającą na klonowanie obiektów bez znajomości ich typu.
+    \item \textbf{Obsługa zapisywania do plików} (\texttt{SVG} i \texttt{PNG}): integracja z \texttt{Editor} i \texttt{Document}, przygotowanie procesu serializacji (np. \texttt{SvgSerializerVisitor}) i eksportowania całości sceny w wybranym formacie.
+    \item \textbf{Interfejs użytkownika} (\texttt{AppUi}, \texttt{Toolbar}): stworzenie paska narzędzi (z przyciskami od \texttt{New} do \texttt{Settings}), logika rozmieszczania widgetów i współpracy z \texttt{Editor} (m.in. przełączanie trybów \emph{insert} / \emph{select}).
+\end{itemize}
+
 \section{Podsumowanie}
 \texttt{VecEdit} stanowi przykład aplikacji, w~której zastosowanie wielu wzorców
 projektowych (kompozyt, metoda wytwórcza, strategia, adapter, odwiedzający,
@@ -287,15 +331,17 @@ prototyp i command) umożliwia elastyczną i czytelną strukturę kodu:
 \begin{itemize}
     \item \textbf{Composite} — wspólna obsługa figur i grup (hierarchii),
     \item \textbf{Factory Method} — tworzenie edytorów punktów figur,
-    \item \textbf{Strategy} — łatwe definiowanie akcji dla GUI,
+    \item \textbf{Strategy} — łatwe definiowanie akcji dla GUI (także w postaci \texttt{FunctorStrategy}),
     \item \textbf{Adapter} — jednolite API do edycji różnych typów figur,
-    \item \textbf{Visitor} — rozdzielenie logiki rysowania i serializacji,
+    \item \textbf{Visitor} — rozdzielenie logiki rysowania, serializacji i bitmap,
     \item \textbf{Prototype} — proste klonowanie figur,
     \item \textbf{Command} — mechanizm cofania i ponawiania operacji.
 \end{itemize}
 
 Dzięki temu kod można łatwo rozwijać (dodawać nowe rodzaje figur, strategie, odwiedzających) 
 i utrzymywać.
+
+\textbf{TODO: rozbudować obsługę warstw i blokowania figur.}
 
 \vspace{1em}
 \noindent

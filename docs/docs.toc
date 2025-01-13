@@ -1,0 +1,23 @@
+\babel@toc {polish}{}\relax 
+\contentsline {section}{\numberline {1}Wstęp}{1}{section.1}%
+\contentsline {section}{\numberline {2}Wzorce projektowe i ich zastosowanie}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Kompozyt (\emph {Composite})}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Metoda wytwórcza (\emph {Factory Method})}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Strategia (\emph {Strategy})}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Adapter}{3}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Odwiedzający (\emph {Visitor})}{4}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Prototyp (\emph {Prototype})}{4}{subsection.2.6}%
+\contentsline {section}{\numberline {3}Opis użytych bibliotek i narzędzi}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Raylib (5.5)}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}RayGui}{4}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}C++20 i CMake}{5}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Instrukcja użytkownika}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Uruchomienie programu}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Interfejs programu — krótki opis}{5}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Podstawowe operacje}{6}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Instrukcja instalacji i kompilacji}{7}{section.5}%
+\contentsline {section}{\numberline {6}Podział pracy w zespole}{7}{section.6}%
+\contentsline {paragraph}{Adam Rogowski}{7}{section*.2}%
+\contentsline {paragraph}{Szymon Sawoń}{8}{section*.3}%
+\contentsline {paragraph}{Bartosz Siemaszkiewicz}{8}{section*.4}%
+\contentsline {section}{\numberline {7}Podsumowanie}{8}{section.7}%
