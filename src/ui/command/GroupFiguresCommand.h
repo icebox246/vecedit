@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <algorithm>
 
 #include "../../figure/Figure.h"
 #include "../../figure/FigureGroup.h"
