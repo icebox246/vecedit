@@ -121,7 +121,7 @@ void ui::FigurePropertiesPanel::updateStrokeWeight(float& yOffset) {
   GuiSlider(Rectangle{rect.x + 10, yOffset + 20, rect.width - 40, 20}, "", "",
             &f, 0, 32);
 
-  f = std::floorf(f / 0.5) * 0.5;
+  f = std::floor(f / 0.5) * 0.5;
 
   GuiLabel(Rectangle{rect.x + rect.width - 25, yOffset + 20, 25, 20},
            std::format("{:.1f}", f).c_str());
