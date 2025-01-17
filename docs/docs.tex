@@ -42,7 +42,7 @@ obiektów graficznych (takich jak prostokąty, okręgi czy wielokąty).
 Program korzysta z biblioteki \textbf{raylib} (w wersji 5.5) do wyświetlania okna, 
 rysowania figur na ekranie oraz pobierania zdarzeń wejściowych od użytkownika 
 (klawiatura, mysz). Do tworzenia interfejsu graficznego w trybie \emph{immediate mode}
-używana jest biblioteka \textbf{RayGui}.  
+używana jest biblioteka \textbf{Raygui}.  
 
 Aplikacja pozwala na:
 \begin{itemize}
@@ -465,7 +465,7 @@ class figure::PolygonFigure {
 
 \subsection{Odwiedzający (\emph{Visitor})}
 
-\begin{figure}
+\begin{figure}[H]
 
 \begin{plantuml}
 @startuml 
@@ -650,6 +650,14 @@ ui::strategy::SetFigureInsertStrategy *--- figure::Figure : stores the prototype
 \section{Opis użytych bibliotek i narzędzi}
 
 \subsection{Raylib (5.5)}
+
+\begin{figure}[H]
+\begin{center}
+  \includegraphics[height=2cm]{figures/raylib_256x256.png} 
+\end{center}
+\caption{Logo projektu Raylib}
+\end{figure}
+
 W projekcie korzystamy z \textbf{Raylib} (\verb|https://www.raylib.com/|) w wersji 5.5, która zapewnia:
 \begin{itemize}
     \item Wyświetlanie okna aplikacji w trybie 2D (np. \texttt{InitWindow}, \texttt{WindowShouldClose}),
@@ -658,9 +666,16 @@ W projekcie korzystamy z \textbf{Raylib} (\verb|https://www.raylib.com/|) w wers
     \item Zapisywanie wyrenderowanej bitmapy do pliku (np. \texttt{ExportImage}).
 \end{itemize}
 
-\subsection{RayGui} 
+\subsection{Raygui} 
 
-Używamy \textbf{RayGui} (\verb|https://github.com/raysan5/raygui|) -- dodatek do Raylib, która wspiera tworzenie interfejsu
+\begin{figure}[H]
+\begin{center}
+  \includegraphics[height=2cm]{figures/raygui_256x256.png} 
+\end{center}
+\caption{Logo projektu Raygui}
+\end{figure}
+
+Używamy \textbf{Raygui} (\verb|https://github.com/raysan5/raygui|) -- dodatek do Raylib, która wspiera tworzenie interfejsu
 graficznego w tzw. \emph{immediate mode} — przyciski, suwaki i teksty
 generowane są bezpośrednio podczas rysowania każdej klatki i natychmiastowo
 obsługiwana jest ich interakcja. Umożliwia to proste tworzenie intefejsów
@@ -669,6 +684,16 @@ użytkownika jednocześnie pozwalając nam stworzyć własny szkielet wzorców
 projektowych obługujących ten interfejs.
 
 \subsection{C++20 i CMake}
+
+\begin{figure}[H]
+\begin{center}
+  \includegraphics[height=2cm]{figures/ISO_C++_Logo.png} 
+  \hspace{1cm}
+  \includegraphics[height=2cm]{figures/CMake-Logo-1.png} 
+\end{center}
+\caption{Logo ISO C++ i projektu CMake}
+\end{figure}
+
 \begin{itemize}
     \item \textbf{C++20} — W projekcie używamy \texttt{std::filesystem} do
       obsługi plików, \texttt{std::format} do wygodnego formatowania tekstu,
