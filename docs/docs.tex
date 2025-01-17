@@ -1,5 +1,5 @@
 \documentclass[a4paper,12pt]{article}
-\usepackage[polish]{babel}
+\usepackage{polski}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
@@ -8,6 +8,12 @@
 \usepackage{amsmath}
 \usepackage{geometry}
 \usepackage{enumitem}
+\usepackage{plantuml}
+\usepackage{fontspec}
+\usepackage{float}
+
+\synctex=1
+
 \geometry{
     a4paper,
     left=25mm,
@@ -25,6 +31,8 @@
 
 \maketitle
 \tableofcontents
+
+\vfill
 
 \section{Wstęp}
 
@@ -46,6 +54,8 @@ Aplikacja pozwala na:
     \item otwieranie, zamykanie i przełączanie się między wieloma zakładkami dokumentów.
 \end{itemize}
 
+\pagebreak
+
 \section{Wzorce projektowe i ich zastosowanie}
 
 Poniżej przedstawiono zastosowane wewnątrz aplikacji wzorce projektowe,
@@ -53,27 +63,98 @@ z uwzględnieniem istotnych elementów w~kodzie oraz komentarzy dotyczących
 możliwych zmian (tzw. \emph{wektora zmian}).
 
 \subsection{Kompozyt (\emph{Composite})}
+
+\begin{figure}[H]
+  
+\begin{plantuml}
+@startuml
+set separator ::
+
+abstract figure::Figure {
+  {method} ...
+  +{abstract} Vector2 getOrigin()
+  +{abstract} void setOrigin(Vector2 origin)
+  +{abstract} void accept(visitor::FigureVisitor& vis)
+  +{abstract} std::shared_ptr<PointEditor> makePointEditor()
+  {method} ...
+}
+
+class figure::FigureBase<FigureType> {
+  ...
+
+  {method} ...
+  +Vector2 getOrigin()
+  +void setOrigin(Vector2 newOrigin)
+  +void accept(visitor::FigureVisitor& vis)
+  {method} ...
+}
+
+figure::Figure <|-- figure::FigureBase : <<implements>>
+
+class figure::FigureGroup {
+  -std::vector<std::shared_ptr<Figure> > children;
+
+  +void addChild(std::shared_ptr<Figure> figure)
+  +void removeChild(std::shared_ptr<Figure> figure)
+  +const std::vector<std::shared_ptr<Figure> >& getChildren()
+  {method} ...
+  +Vector2 getOrigin()
+  +void setOrigin(Vector2 newOrigin)
+  +void accept(visitor::FigureVisitor& vis)
+  {method} ...
+}
+
+figure::Figure <|-- figure::FigureGroup
+figure::FigureGroup "1" *-- "n" figure::Figure
+
+class figure::CircleFigure {
+}
+
+figure::FigureBase <|-- figure::CircleFigure : FigureType = CircleFigure
+
+class figure::RectFigure {
+}
+
+figure::FigureBase <|-- figure::RectFigure : FigureType = RectFigure
+
+class figure::PolygonFigure {
+}
+
+figure::FigureBase <|-- figure::PolygonFigure : FigureType = PolygonFigure
+@enduml
+\end{plantuml}
+
+\caption{Schemat klas związanych z Kompozytem}
+
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Cel:} Umożliwienie traktowania pojedynczych obiektów
     (figury) i grup obiektów (grupy figur) w sposób jednolity, dzięki interfejsowi
     \texttt{Figure}. 
     \item \textbf{Struktura:} 
+
     \begin{itemize}
       \item \texttt{figure} -- przestrzeń nazw, w której znajdują się klasy komponentów
-      \item \texttt{Figure} -- interfejs \emph{komponentu}. Posiada m.in. metody typu 
-      \texttt{accept(visitor)}, które w~implementacjach \emph{Composite} przekazują
-        wywołanie wszystkim dzieciom. (\verb|src/figure/Figure.h|)
+      \item \texttt{Figure} -- interfejs \emph{komponentu}. Posiada m.in.
+        metody typu \texttt{accept(visitor)}, które w~implementacjach
+        \emph{Composite} przekazują wywołanie wszystkim dzieciom, metody
+        \verb|getOrigin()| i \verb|setOrigin(...)| pozwalające na ustawianie
+        punktu "początkowego" dla figury bądź grupy figur (używane do
+        przesuwania figur) (\verb|src/figure/Figure.h|)
       \item \texttt{FigureGroup} -- \emph{kompozyt}, zawiera wektor \texttt{children}
-      oraz metody \texttt{addChild(...)} itp. (\verb|src/figure/FigureGroup.h|)
+      oraz metody \texttt{addChild(...)},  \texttt{removeChild(...)} itp. (\verb|src/figure/FigureGroup.h|)
       \item \texttt{RectFigure}, \texttt{CircleFigure}, \texttt{PolyFigure} -- 
       \emph{konkretne komponenty (liście)}, nie posiadają dzieci. (\verb|src/figure/*Figure.h|)
     \end{itemize}
     \item \textbf{Użycie:} 
     \begin{itemize}
-      \item W edytorze (\texttt{Editor} - \verb|src/ui/Editor.cpp|) przy \texttt{groupFigures()} i \texttt{ungroupFigures()}
-      łączymy/rozbijamy figury w drzewiastą strukturę.
+      \item W edytorze (\texttt{Editor} - \verb|src/ui/Editor.cpp|) przy
+        \texttt{groupFigures()} i \texttt{ungroupFigures()} łączymy/rozbijamy
+        figury w drzewiastą strukturę.
       \item \texttt{accept(visitor)} w \texttt{FigureGroup} wywołuje
-        \texttt{accept} u wszystkich dzieci, co integruje się z~\emph{Visitor}. (np. \verb|ui::Editor::renderMainContent()|)
+        \texttt{accept} u wszystkich dzieci, co integruje się z~\emph{Visitor}.
+        (np. \verb|ui::Editor::renderMainContent()|)
     \end{itemize}
     \item \textbf{Wektor zmian:} Dodanie kolejnych typów figur nie wymaga zmian
       w \texttt{FigureGroup}, wystarczy zaimplementować metody interfejsu 
@@ -81,6 +162,83 @@ możliwych zmian (tzw. \emph{wektora zmian}).
 \end{itemize}
 
 \subsection{Metoda wytwórcza (\emph{Factory Method})}
+
+\begin{figure}[H]
+
+\begin{plantuml}
+@startuml
+
+set separator ::
+
+abstract figure::Figure {
+  +{abstract} std::shared_ptr<PointEditor> makePointEditor()
+}
+
+class figure::FigureBase<FigureType> {
+}
+
+figure::Figure <|-- figure::FigureBase : <<implements>>
+
+class figure::FigureGroup {
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::Figure <|-- figure::FigureGroup
+figure::FigureGroup "1" *-- "n" figure::Figure
+
+class figure::CircleFigure {
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::FigureBase <|-- figure::CircleFigure : FigureType = CircleFigure
+
+class figure::RectFigure {
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::FigureBase <|-- figure::RectFigure : FigureType = RectFigure
+
+class figure::PolygonFigure {
+  +std::shared_ptr<PointEditor> makePointEditor()
+}
+
+figure::FigureBase <|-- figure::PolygonFigure : FigureType = PolygonFigure
+
+
+interface figure::PointEditor {
+}
+
+class figure::adapter::GroupPointEditor {
+}
+
+figure::PointEditor <|-- figure::adapter::GroupPointEditor : <<implement>>
+figure::adapter::GroupPointEditor <... figure::FigureGroup : <<creates>>
+
+class figure::adapter::RectFigurePointEditor {
+}
+
+figure::PointEditor <|-- figure::adapter::RectFigurePointEditor : <<implement>>
+figure::adapter::RectFigurePointEditor <... figure::RectFigure : <<creates>>
+
+class figure::adapter::CircleFigurePointEditor {
+}
+
+figure::PointEditor <|-- figure::adapter::CircleFigurePointEditor : <<implement>>
+figure::adapter::CircleFigurePointEditor <... figure::CircleFigure : <<creates>>
+
+class figure::adapter::PolygonFigurePointEditor {
+}
+
+figure::PointEditor <|-- figure::adapter::PolygonFigurePointEditor : <<implement>>
+figure::adapter::PolygonFigurePointEditor <... figure::PolygonFigure : <<creates>>
+
+@enduml
+\end{plantuml}
+
+\caption{Schemat klas związanych z Metodą wytwórczą}
+
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Cel:} Abstrakcja sposobu tworzenia obiektów. 
     W naszym projekcie służy do tworzenia odpowiedniej implementacji 
@@ -89,9 +247,9 @@ możliwych zmian (tzw. \emph{wektora zmian}).
     \begin{itemize}
         \item \texttt{Figure} deklaruje wirtualną metodę \texttt{makePointEditor()}, 
         która w podklasach (\texttt{RectFigure}, \texttt{CircleFigure}, \dots) zwraca
-        odpowiedni edytor (np. \texttt{RectFigurePointEditor}).
+        odpowiedni edytor (np. \texttt{RectFigurePointEditor}) implementujący interfejs \texttt{PointEditor}.
         \item \texttt{Editor} korzysta z tej metody, by pobierać adapter 
-        do edycji punktów figury, nie wiedząc \emph{jaki to} konkretnie edytor.
+          do edycji punktów figury, nie wiedząc \emph{jaki to} konkretnie edytor. (np. \verb|ui::Editor::processModeSelect()|)
     \end{itemize}
     \item \textbf{Wektor zmian:} Nowy typ figury (np. \texttt{StarFigure}) 
     wystarczy wyposażyć w swoją implementację \texttt{makePointEditor()}, 
@@ -99,6 +257,68 @@ możliwych zmian (tzw. \emph{wektora zmian}).
 \end{itemize}
 
 \subsection{Strategia (\emph{Strategy})}
+
+\begin{figure}[H]
+ 
+\begin{plantuml}
+@startuml 
+set separator ::
+
+interface  ui::strategy::Strategy<Args...> {
+  {abstract} void execute(Args... args)
+}
+
+class ui::strategy::NewDocumentStrategy {
+  +void execute()
+}
+
+ui::strategy::Strategy <|-- ui::strategy::NewDocumentStrategy : Args... = ()
+
+class ui::strategy::OpenDocumentStrategy {
+  +void execute(std::filesystem::path docName)
+}
+
+ui::strategy::Strategy <|-- ui::strategy::OpenDocumentStrategy : Args... = (std::filesystem::path)
+
+class ui::strategy::SetFigureInsertStrategy {
+  -std::shared_ptr<figure::Figure> figurePrototype
+  +void execute()
+}
+
+ui::strategy::Strategy <|-- ui::strategy::SetFigureInsertStrategy : Args... = ()
+
+interface  ui::strategy::FunctorStrategy<FArgs...> {
+  {field} -std::function<void(FArgs...)> f
+  +void execute(FArgs... args)
+}
+
+ui::strategy::Strategy <|-- ui::strategy::FunctorStrategy : Args... = FArgs...
+
+class ui::IconButton {
+  -std::shared_ptr<strategy::Strategy<> > strategy
+}
+
+ui::IconButton o-- ui::strategy::Strategy
+
+class ui::KeyboardShortcut {
+  -std::shared_ptr<strategy::Strategy<> > strategy
+}
+
+ui::KeyboardShortcut o-- ui::strategy::Strategy
+
+class ui::DocumentTabs {
+  -std::shared_ptr<strategy::Strategy<std::filesystem::path> > openStrategy
+}
+
+ui::DocumentTabs o-- ui::strategy::Strategy
+
+@enduml 
+\end{plantuml}
+
+\caption{Schemat klas związanych z Strategią}
+
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Cel:} Definiowanie wymiennych algorytmów/akcji, 
     które można przypisać do przycisków lub skrótów klawiaturowych (np. \emph{undo}, \emph{redo}).
@@ -110,7 +330,7 @@ możliwych zmian (tzw. \emph{wektora zmian}).
           podczas wywołania strategi, 
         \item \texttt{UndoStrategy}, \texttt{RedoStrategy}, \texttt{SetSelectStrategy} 
         itp. -- konkretne strategie używane przez guziki i skróty klawiszowe,
-        \item \texttt{FunctorStrategy<...>} -- pozwala zdefiniować strategię
+        \item \texttt{FunctorStrategy<...>} -- (plik \texttt{FunctorStrategy.h}) pozwala zdefiniować strategię
         w oparciu o lambda/domknięcie (\emph{closure}), bez tworzenia nowej podklasy.
     \end{itemize}
     \item \textbf{Użycie:} 
@@ -128,6 +348,98 @@ możliwych zmian (tzw. \emph{wektora zmian}).
 \end{itemize}
 
 \subsection{Adapter}
+
+\begin{figure}[H]
+
+\begin{plantuml}
+@startuml
+
+set separator ::
+
+interface figure::PointEditor {
+  {abstract} std::vector<Point> getEditPoints()
+  {abstract} void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+class figure::adapter::GroupPointEditor {
+  -std::shared_ptr<FigureGroup> group;
+
+  +GroupPointEditor(std::shared_ptr<FigureGroup> group)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::GroupPointEditor : <<implement>>
+figure::adapter::GroupPointEditor o-- figure::FigureGroup
+
+class figure::adapter::RectFigurePointEditor {
+  -std::shared_ptr<RectFigure> rect
+
+  +RectFigurePointEditor(std::shared_ptr<RectFigure> rect)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::RectFigurePointEditor : <<implement>>
+figure::adapter::RectFigurePointEditor o-- figure::RectFigure
+
+class figure::adapter::CircleFigurePointEditor {
+  -std::shared_ptr<CircleFigure> circle
+
+  +CircleFigurePointEditor(std::shared_ptr<CircleFigure> circle)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::CircleFigurePointEditor : <<implement>>
+figure::adapter::CircleFigurePointEditor o-- figure::CircleFigure
+
+class figure::adapter::PolygonFigurePointEditor {
+  -std::shared_ptr<PolygonFigure> poly
+
+  +PolygonFigurePointEditor(std::shared_ptr<PolygonFigure> poly)
+
+  +std::vector<Point> getEditPoints()
+  +void updatePointPosition(std::size_t pointId, Vector2 newPos)
+}
+
+figure::PointEditor <|-- figure::adapter::PolygonFigurePointEditor : <<implement>>
+figure::adapter::PolygonFigurePointEditor o-- figure::PolygonFigure
+  
+
+class figure::CircleFigure {
+  -float radius
+
+  +void setRadius(float newRadius)
+  +float getRadius()
+}
+
+class figure::RectFigure {
+  -Vector2 dimensions
+
+  +void setDimensions(Vector2 newDimensions)
+  +Rectangle getRectangle()
+}
+
+class figure::PolygonFigure {
+  -std::vector<Vector2> pointOffsets
+
+  +std::size_t getPointCount()
+  +void initializeRegularPolygon(float radius)
+  +void setOffset(std::size_t index, Vector2 value)
+  +const std::vector<Vector2>& getOffsets()
+}
+
+@enduml
+\end{plantuml}
+
+\caption{Schemat klas związanych z Adapterem}
+
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Cel:} Udostępnienie wspólnego interfejsu edycji punktów figur 
     (\texttt{PointEditor}) mimo iż każda figura ma odmienne właściwości i sposób 
@@ -138,9 +450,13 @@ możliwych zmian (tzw. \emph{wektora zmian}).
       \item \texttt{PointEditor} -- interfejs z metodami \texttt{getEditPoints()}
       i \texttt{updatePointPosition(...)},
       \item \texttt{RectFigurePointEditor}, \texttt{CircleFigurePointEditor}, 
-      \texttt{PolyFigurePointEditor} -- adaptery do konkretnych figur,
-      \item Każdy adapter \emph{zwraca} (np. w \texttt{getEditPoints()}) położenia uchwytów 
-      charakterystyczne dla swojej figury (np. promień dla koła).
+        \texttt{PolyFigurePointEditor} -- adaptery dla konkretnych typów figur do interfejsu \texttt{PointEditor},
+
+      \item Każdy adapter \emph{zwraca} (np. w \texttt{getEditPoints()})
+        położenia uchwytów charakterystyczne dla swojej figury (np. promień dla
+        koła),a  \verb|updatePointPosition(...)| służy do zmiany pozycji
+        jednego ze zwróconych punktów
+
     \end{itemize}
     \item \textbf{Wektor zmian:} Dodanie nowego kształtu wymaga stworzenia
     nowego adaptera do edycji, a sama logika \texttt{Editor} (obsługująca \texttt{PointEditor})
@@ -148,18 +464,100 @@ możliwych zmian (tzw. \emph{wektora zmian}).
 \end{itemize}
 
 \subsection{Odwiedzający (\emph{Visitor})}
+
+\begin{figure}
+
+\begin{plantuml}
+@startuml 
+
+set separator ::
+
+interface figure::visitor::FigureVisitor {
+  +{abstract} void visit(FigureGroup& group)
+  +{abstract} void visit(RectFigure& rect)
+  +{abstract} void visit(CircleFigure& circle)
+  +{abstract} void visit(PolygonFigure& poly)
+}
+
+class figure::visitor::RendererVisitor {
+  +void visit(FigureGroup& group)
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+  +void visit(PolygonFigure& poly)
+}
+
+figure::visitor::FigureVisitor <|-- figure::visitor::RendererVisitor
+
+class figure::visitor::BitmapRendererVisitor {
+  -int width, height
+  -RenderTexture2D renderTexture
+
+  +BitmapRendererVisitor(int width, int height)
+
+  +void beginMode()
+  +void endAndSaveToFile(const std::filesystem::path& filepath)
+}
+
+figure::visitor::RendererVisitor <|-- figure::visitor::BitmapRendererVisitor
+
+class figure::visitor::PointIntersectionVisitor {
+  -Vector2 point
+  -std::shared_ptr<figure::Figure> intersectingFigure
+
+  +PointIntersectionVisitor(Vector2 point)
+
+  +bool intersects()
+  +std::shared_ptr<figure::Figure> getIntersectingFigure()
+
+  +void visit(FigureGroup& group)
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+  +void visit(PolygonFigure& poly)
+}
+
+figure::visitor::FigureVisitor <|-- figure::visitor::PointIntersectionVisitor
+
+class figure::visitor::SvgSerializerVisitor {
+  -std::stringstream outStream
+
+  +SvgSerializerVisitor(Vector2 point)
+
+  +void saveToFile(const std::filesystem::path& filepath)
+
+  +void visit(FigureGroup& group)
+  +void visit(RectFigure& rect)
+  +void visit(CircleFigure& circle)
+  +void visit(PolygonFigure& poly)
+}
+
+figure::visitor::FigureVisitor <|-- figure::visitor::SvgSerializerVisitor
+
+
+abstract figure::Figure {
+  +{abstract} void accept(visitor::FigureVisitor& vis)
+}
+figure::Figure <-- figure::visitor::FigureVisitor : <<accepts>>
+@enduml
+\end{plantuml}
+
+\caption{Schemat klas związanych z Odwiedzającym}
+
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Cel:} Oddzielenie logiki przetwarzania figur (np. rysowania, 
     zapisu do pliku) od samych klas figur.
     \item \textbf{Struktura i użycie:}
     \begin{itemize}
       \item \texttt{figure::visitor} -- przestrzeń nazw, w której znajdują się klasy odwiedzających
-      \item \texttt{FigureVisitor} -- interfejs odwiedzającego (\verb|src/figure/visitor/FigureVisitor.h|), 
-      \item \texttt{RendererVisitor} (renderuje figury na ekranie) (\verb|src/figure/visitor/RendererVisitor.cpp|),
+      \item \texttt{FigureVisitor} -- interfejs odwiedzającego (plik \verb|FigureVisitor.h|), 
+      \item \texttt{RendererVisitor} (renderuje figury na ekranie) (plik \verb|RendererVisitor.cpp|),
       \item \texttt{SvgSerializerVisitor} (zapisuje wektorowo do pliku SVG),
       \item \texttt{BitmapRendererVisitor} (obsługa zapisu do formatów bitmapowych np. \texttt{PNG}).
       \item Metoda \texttt{accept(visitor)} w \texttt{Figure} (bądź \texttt{FigureGroup})
       wywołuje \texttt{visitor.visit(...)} odpowiedniego typu.
+      \item Odwiedzający jest używany np. w \verb|ui::Editor::exportDocument| 
+        do zapisu dokumentu do bitmapy
     \end{itemize}
     \item \textbf{Wektor zmian:} Dodanie kolejnej operacji (np. liczenie pola figur)
     wymaga utworzenia nowej klasy odwiedzającego, bez modyfikacji istniejących figur. Z kolei
@@ -168,6 +566,69 @@ możliwych zmian (tzw. \emph{wektora zmian}).
 \end{itemize}
 
 \subsection{Prototyp (\emph{Prototype})}
+
+\begin{figure}[H]
+
+\begin{plantuml}
+@startuml
+
+set separator ::
+
+abstract figure::Figure {
+  +{abstract} std::shared_ptr<Figure> clone()
+}
+
+class figure::FigureBase<FigureType> {
+  +std::shared_ptr<Figure> clone()
+}
+
+figure::Figure <|-- figure::FigureBase : <<implements>>
+
+class figure::FigureGroup {
+  +std::shared_ptr<Figure> clone()
+}
+
+figure::Figure <|-- figure::FigureGroup
+figure::FigureGroup "1" *-- "n" figure::Figure
+
+class figure::CircleFigure {
+}
+
+figure::FigureBase <|-- figure::CircleFigure : FigureType = CircleFigure
+
+class figure::RectFigure {
+}
+
+figure::FigureBase <|-- figure::RectFigure : FigureType = RectFigure
+
+class figure::LineFigure {
+}
+
+figure::FigureBase <|-- figure::LineFigure : FigureType = LineFigure
+
+class figure::PolygonFigure {
+}
+
+figure::FigureBase <|-- figure::PolygonFigure : FigureType = PolygonFigure
+ 
+class ui::Editor {
+  -std::shared_ptr<figure::Figure> figurePrototype
+}
+ui::Editor o--- "1" figure::Figure : holds prototype
+
+class ui::strategy::SetFigureInsertStrategy {
+  -std::shared_ptr<figure::Figure> figurePrototype
+}
+
+ui::strategy::SetFigureInsertStrategy *--- figure::Figure : stores the prototype
+
+@enduml
+\end{plantuml}
+
+\caption{Schemat klas związanych z Prototypem}
+
+\end{figure}
+
 \begin{itemize}
     \item \textbf{Cel:} Możliwość tworzenia nowych instancji obiektów (figur)
       poprzez klonowanie bez tworzenia zależności pomiędzy kodem wywołującym 
@@ -312,7 +773,7 @@ Kompilacja ze źródłeł odbywa się w następujących krokach:
 \begin{itemize}
     \item \textbf{Composite} (\texttt{FigureGroup}): stworzenie klasy grupującej figury i zarządzanie hierarchią dzieci (w tym obsługa zagnieżdżonych grup).
     \item \textbf{Command} (w tym \texttt{RemoveFiguresCommand}, \texttt{GroupFiguresCommand} i \texttt{CommandManager}): implementacja głównego mechanizmu \texttt{undo}/\texttt{redo}, obejmująca tworzenie i cofanie poleceń.
-    \item \textbf{Zarządzanie warstwami i blokowaniem figur}: dodatkowo rozbudował \texttt{Editor} o możliwość przesuwania obiektów między warstwami oraz blokowania/odblokowywania figur w drzewie.
+    \item \textbf{Zarządzanie hierarchią figur}: dodatkowo rozbudował \texttt{Editor} o możliwość przesuwania obiektów wewnątrz grupy oraz ukrywał/pokazywał figur w drzewie.
     \item \textbf{Interfejs użytkownika} (\texttt{AppUi}, \texttt{Toolbar}): stworzenie paska narzędzi (z przyciskami od \texttt{New} do \texttt{Settings}), logika rozmieszczania widgetów i współpracy z \texttt{Editor} (m.in. przełączanie trybów \emph{insert} / \emph{select}).
 \end{itemize}
 
