@@ -681,7 +681,7 @@ generowane są bezpośrednio podczas rysowania każdej klatki i natychmiastowo
 obsługiwana jest ich interakcja. Umożliwia to proste tworzenie intefejsów
 (dodanie jednej kontrolki to wywołanie jednej funkcji np. \texttt{GuiButton})
 użytkownika jednocześnie pozwalając nam stworzyć własny szkielet wzorców
-projektowych obługujących ten interfejs.
+projektowych obsługujących ten interfejs.
 
 \subsection{C++20 i CMake}
 
@@ -765,10 +765,16 @@ cd build
 
 \section{Instrukcja instalacji i kompilacji}
 
-Kompilacja ze źródłeł odbywa się w następujących krokach:
+Kompilacja ze źródeł odbywa się w następujących krokach:
 
 \begin{enumerate}
-    \item \textbf{Rozpakowanie zip} - źródła projektu dostarczone są w archiwów zip, które należy rozpakować. \textbf{TODO: dodać dokładną nazwę folderu ze źródłami}
+    \item \textbf{Rozpakowanie zip} - źródła projektu dostarczone są w archiwów zip, które należy rozpakować. Projekt posiada następującą strukturę:
+    \begin{itemize}
+      \item \texttt{src} - główny kod projektu
+      \item \texttt{thirdparty} - kod bibliotek zewnętrznych użytych w projekcie
+      \item \texttt{docs} - źródła użyte do stworzenia dokumentacji
+      \item \texttt{bin} - katalog z gotowymi plikami wykonywalnym na Linux i Windows architektury x86\_64
+    \end{itemize}
     \item \textbf{Kompilacja z użyciem CMake}
     \begin{itemize}
       \item  \textbf{W linii poleceń} - z wykorzystaniem \texttt{GNU Make} (proces opisany również w \texttt{README.md})
